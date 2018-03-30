@@ -1,33 +1,21 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-var UserSchema = mongoose.Schema({
-	name: {
-		type: String
-	},
+const UserSchema = mongoose.Schema({
+	name: String,
 	email: {
 		type: String,
 		unique: true,
 		sparse: true
 	},
-  password: {
-		type: String
-	},
-  googleId: {
-    type: String
-  },
-	facebookId: {
-    type: String
-  },
-	avatar: {
-		type: String
-	},
-  logintype: {
-    type: String
-  }
+  password: String,
+  googleId: String,
+	facebookId: String,
+	avatar: String,
+  logintype: String
 });
 
-var User = module.exports = mongoose.model('User', UserSchema);
+const User = module.exports = mongoose.model('User', UserSchema);
 
 module.exports.createUser = function(newUser, callback){
 
@@ -40,7 +28,7 @@ module.exports.createUser = function(newUser, callback){
 }
 
 module.exports.getUserByMail = function(email, callback) {
-  var query = {email: email};
+  const query = {email: email};
   User.findOne(query, callback);
 }
 
