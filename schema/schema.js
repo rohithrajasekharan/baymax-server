@@ -3,6 +3,8 @@ const Article = require('../models/article-model');
 const Opinion = require('../models/comment-model');
 const Answer = require('../models/answer-model');
 const Question = require('../models/question-model');
+const Participant = require('../models/participant-model');
+const Conversation = require('../models/conversation-model');
 const User = require('../models/user-model');
 const _ = require('lodash');
 
@@ -120,6 +122,39 @@ const UserType = new GraphQLObjectType({
     })
 });
 
+const ConversationType = new GraphQLObjectType({
+    name: 'Conversation',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        type: { type: GraphQLString },
+        participants: {
+                  type: new GraphQLList(ParticipantType),
+                  resolve(parent, args){
+                      return Participant.find({ conversationId: parent.id });
+                  }
+          }
+    })
+});
+
+const ParticipantType = new GraphQLObjectType({
+    name: 'Participant',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        userinfo: {
+          type: UserType,
+          resolve(parent, args){
+              return User.findById(parent.userId);
+          }
+        },
+        conversations: {
+          type: ConversationType,
+          resolve(parent, args){
+              return Conversation.findById(parent.conversationId);
+          }
+        }
+    })
+});
+
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -168,6 +203,18 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 return Answer.find({questionId: args.id});
             }
+        },
+        conversations: {
+            type: new GraphQLList(ConversationType),
+            resolve(parent, args){
+                return Conversation.find();
+            }
+        },
+        participants: {
+          type: new GraphQLList(ParticipantType),
+          resolve(parent, args){
+              return Participant.find();
+          }
         }
     }
 });
@@ -235,6 +282,20 @@ const Mutation = new GraphQLObjectType({
                     userId: args.userId
                 });
                 return answer.save();
+            }
+        },
+        addParticipant: {
+            type: ParticipantType,
+            args: {
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                conversationId:  { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args){
+                let participant = new Participant({
+                    userId: args.userId,
+                    conversationId: args.conversationId
+                });
+                return participant.save();
             }
         },
     }

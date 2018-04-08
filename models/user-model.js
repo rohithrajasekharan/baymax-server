@@ -12,7 +12,8 @@ const UserSchema = mongoose.Schema({
   googleId: String,
 	facebookId: String,
 	avatar: String,
-  logintype: String
+  logintype: String,
+	lasttimestamp: Date
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);

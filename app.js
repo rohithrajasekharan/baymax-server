@@ -10,6 +10,8 @@ const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const graphqlHTTP = require('express-graphql');
 const schema = require('./schema/schema');
+const socket = require('socket.io');
+const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
 var config = require('./config');
@@ -26,7 +28,7 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+app.use(express.static('public'));
 
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
@@ -40,6 +42,8 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true
 }));
 
-app.listen(PORT, () => {
-  console.log('app listening on port 8080');
+const server = app.listen(PORT, () => {
+  console.log('app listening on port '+PORT);
 })
+const io = module.exports.io = socket(server);
+io.on('connection', SocketManager);
