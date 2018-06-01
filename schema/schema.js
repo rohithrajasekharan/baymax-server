@@ -239,6 +239,7 @@ const Mutation = new GraphQLObjectType({
         addArticle: {
             type: ArticleType,
             args: {
+                title: { type: new GraphQLNonNull(GraphQLString) },
                 content: { type: new GraphQLNonNull(GraphQLString) },
                 userId: { type: new GraphQLNonNull(GraphQLID) },
                 pageName: { type: new GraphQLNonNull(GraphQLString) },

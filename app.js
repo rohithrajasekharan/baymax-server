@@ -13,7 +13,8 @@ const schema = require('./schema/schema');
 const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 8080;
+var config = require('./config');
 
 app.use(cors());
 app.use(cookieParser());
