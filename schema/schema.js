@@ -256,14 +256,13 @@ const RootQuery = new GraphQLObjectType({
           type: new GraphQLList(ProductType),
           args: { id: { type: GraphQLID } },
           resolve(parent, args){
-            var arrayf=[];
+            var array=[];
             Order.find({'userId':args.id}).then((order)=>{
-                order.map((ordered)=>{
-                return Product.findById(ordered.productId);
+                order.map((resp)=>{
+                  array.push(resp.productId);
                 })
-              }).then(()=>{
-              return arrayf;
               })
+              return Product.find( { _id : { $in: array } })
           }
         },
         cart: {
