@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const User = require('../models/user-model');
 
 const MessagesSchema = mongoose.Schema({
 	 conversationId: String,
-	 sendersId: String,
+	 sendersId: [{type: Schema.Types.ObjectId, ref: 'User'}],
    message: String,
 	 createdAt: Date
 });

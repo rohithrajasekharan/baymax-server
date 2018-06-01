@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-
+const Article = require('../models/article-model');
+const Schema = mongoose.Schema;
 const UserSchema = mongoose.Schema({
 	name: String,
 	email: {
@@ -13,7 +14,8 @@ const UserSchema = mongoose.Schema({
 	facebookId: String,
 	avatar: String,
   logintype: String,
-	lasttimestamp: Date
+	lasttimestamp: Date,
+	bookmarks: [{type: Schema.Types.ObjectId, ref: 'Article'}]
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);

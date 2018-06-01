@@ -24,6 +24,9 @@ const ArticleType = new GraphQLObjectType({
         id: { type: GraphQLID },
         title: { type: GraphQLString },
         content: { type: GraphQLString },
+        pageName: { type: GraphQLString },
+        videoId: {type: GraphQLString},
+        imageId: {type: GraphQLString},
         author: {
             type: UserType,
             resolve(parent, args){
@@ -84,6 +87,7 @@ const QuestionType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         question: { type: GraphQLString },
+        pageName: { type: GraphQLString },
         author: {
           type: UserType,
           resolve(parent, args){
@@ -118,7 +122,8 @@ const UserType = new GraphQLObjectType({
                   resolve(parent, args){
                       return Question.find({ userId: parent.id });
                   }
-          }
+          },
+        bookmarks: { type: GraphQLID }
     })
 });
 
@@ -173,21 +178,23 @@ const RootQuery = new GraphQLObjectType({
             }
         },
         articles: {
-            type: new GraphQLList(ArticleType),
-            resolve(parent, args){
-                return Article.find({});
-            }
+          type: new GraphQLList(ArticleType),
+          args: { id: { type: GraphQLString } },
+          resolve(parent, args){
+              return Article.find({pageName: args.id}).sort({_id:-1});
+          }
         },
         questions: {
             type: new GraphQLList(QuestionType),
+            args: { id: { type: GraphQLString } },
             resolve(parent, args){
-                return Question.find({});
+                return Question.find({pageName: args.id}).sort({_id:-1});
             }
         },
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
-                return User.find({});
+                return User.find({}).populate('bookmarks');
             }
         },
         opinions: {
@@ -215,6 +222,13 @@ const RootQuery = new GraphQLObjectType({
           resolve(parent, args){
               return Participant.find();
           }
+        },
+        bookmarks: {
+            type: new GraphQLList(AnswerType),
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args){
+                return User.findById(args.id).populate('bookmarks');
+            }
         }
     }
 });
@@ -225,17 +239,35 @@ const Mutation = new GraphQLObjectType({
         addArticle: {
             type: ArticleType,
             args: {
-                title: { type: new GraphQLNonNull(GraphQLString) },
                 content: { type: new GraphQLNonNull(GraphQLString) },
-                userId: { type: new GraphQLNonNull(GraphQLID) }
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                pageName: { type: new GraphQLNonNull(GraphQLString) },
+                videoId: { type: GraphQLString},
+                imageId: { type: GraphQLString}
             },
             resolve(parent, args){
                 let article = new Article({
                     title: args.title,
                     content: args.content,
-                    userId: args.userId
+                    pageName: args.pageName,
+                    userId: args.userId,
+                    videoId: args.videoId,
+                    imageId: args.imageId
                 });
                 return article.save();
+            }
+        },
+        addBookmarks: {
+            type: UserType,
+            args: {
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                id: { type: new GraphQLNonNull(GraphQLID) },
+            },
+            resolve(parent, args){
+              User.findById(args.userId).then((user)=>{
+                user.bookmarks.push(args.id);
+                user.save();
+              })
             }
         },
         addOpinion: {
@@ -258,12 +290,14 @@ const Mutation = new GraphQLObjectType({
             type: QuestionType,
             args: {
                 question: { type: new GraphQLNonNull(GraphQLString) },
-                userId: { type: new GraphQLNonNull(GraphQLID) }
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                pageName: { type: new GraphQLNonNull(GraphQLString) },
             },
             resolve(parent, args){
                 let question = new Question({
                     question: args.question,
-                    userId: args.userId
+                    userId: args.userId,
+                    pageName: args.pageName
                 });
                 return question.save();
             }

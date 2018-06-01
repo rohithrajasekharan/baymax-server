@@ -7,16 +7,22 @@ module.exports = (socket)=> {
     let newMessage = new Messages({
       conversationId: data.conversationId,
       message: data.message,
-      sendersId: data.handle,
+      sendersId: data.sendersId,
       createdAt: new Date()
     });
-    newMessage.save().then(()=>{
-        io.sockets.emit('chat message',data)
+    newMessage.save().then((resp)=>{
+      Messages.find({_id:resp.id}).populate('sendersId').then((message) => {
+        io.sockets.emit('chat message',message)
+      })
+
+
+
     })
 
   })
 
   socket.on('typing', function(user){
+    console.log(user+" is typing");
       socket.broadcast.emit('typing', user);
   });
 
@@ -30,7 +36,7 @@ module.exports = (socket)=> {
 
     socket.on('iamback',function(){
       User.find({name:socket.username}).then((resp) => {
-          Messages.find({createdAt: {$gt: new Date(resp[0].lasttimestamp)}}).then((data) => {
+          Messages.find({createdAt: {$gt: new Date(resp[0].lasttimestamp)}}).populate('sendersId').sort({_id:1}).then((data) => {
             socket.emit('unreadmessages', data)
           })
       })
