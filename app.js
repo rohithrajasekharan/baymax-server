@@ -33,7 +33,7 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect(process.env.dbUrl||config.keys, () => {
+mongoose.connect(process.env.dbUrl||config.dbUrl, () => {
     console.log("connected to db");
 });
 
