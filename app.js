@@ -14,7 +14,6 @@ const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
-var config = require('./config');
 
 app.use(cors());
 app.use(cookieParser());
