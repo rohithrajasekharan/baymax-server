@@ -5,6 +5,7 @@ const Answer = require('../models/answer-model');
 const Question = require('../models/question-model');
 const Participant = require('../models/participant-model');
 const Conversation = require('../models/conversation-model');
+const Product = require('../models/product');
 const User = require('../models/user-model');
 const _ = require('lodash');
 
@@ -160,6 +161,20 @@ const ParticipantType = new GraphQLObjectType({
     })
 });
 
+const ProductType = new GraphQLObjectType({
+    name: 'Product',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString },
+        price: { type: GraphQLString },
+        description: { type: GraphQLString },
+        image: {type: GraphQLString},
+        prescription: {type: GraphQLString},
+        caution: {type: GraphQLString},
+        usage: {type: GraphQLString},
+        tags: {type: GraphQLList(GraphQLString)}
+    })
+});
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -179,9 +194,9 @@ const RootQuery = new GraphQLObjectType({
         },
         articles: {
           type: new GraphQLList(ArticleType),
-          args: { id: { type: GraphQLString } },
+          args: { pageName: { type: GraphQLString } },
           resolve(parent, args){
-              return Article.find({pageName: args.id}).sort({_id:-1});
+              return Article.find({pageName: args.pageName}).sort({_id:-1});
           }
         },
         questions: {
@@ -229,6 +244,12 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 return User.findById(args.id).populate('bookmarks');
             }
+        },
+        products: {
+          type: new GraphQLList(ProductType),
+          resolve(parent, args){
+              return Product.find();
+          }
         }
     }
 });

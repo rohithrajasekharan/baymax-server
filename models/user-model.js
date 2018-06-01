@@ -15,7 +15,13 @@ const UserSchema = mongoose.Schema({
 	avatar: String,
   logintype: String,
 	lasttimestamp: Date,
-	bookmarks: [{type: Schema.Types.ObjectId, ref: 'Article'}]
+	bookmarks: [{type: Schema.Types.ObjectId, ref: 'Article'}],
+	cart: [String],
+	orders: [{
+		    productId : String,
+		    quantity : Number,
+				status : String
+		     }]
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);
