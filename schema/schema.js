@@ -176,6 +176,35 @@ const ProductType = new GraphQLObjectType({
         tags: {type: GraphQLList(GraphQLString)}
     })
 });
+
+const OrderType = new GraphQLObjectType({
+    name: 'Order',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        product: {
+          type: ProductType,
+          resolve(parent, args){
+              return Product.findById(parent.productId);
+          }
+        },
+        quantity: {type: GraphQLInt},
+        status: {type: GraphQLString}
+    })
+});
+const CartType = new GraphQLObjectType({
+    name: 'Cart',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        product: {
+          type: ProductType,
+          resolve(parent, args){
+              return Product.findById(parent.productId);
+          }
+        }
+    })
+});
+
+
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -249,29 +278,21 @@ const RootQuery = new GraphQLObjectType({
           type: ProductType,
           args: { id: { type: GraphQLID } },
           resolve(parent, args){
-              return Product.findById(args.id);
+              return Cart.find({'userId':args.id}).populate('productId');
           }
         },
         orders: {
-          type: new GraphQLList(ProductType),
+          type: new GraphQLList(OrderType),
           args: { id: { type: GraphQLID } },
           resolve(parent, args){
-            var array=[];
-            Order.find({'userId':args.id}).then((order)=>{
-                order.map((resp)=>{
-                  array.push(resp.productId);
-                })
-              })
-              return Product.find( { _id : { $in: array } })
+            return Order.find({'userId':args.id});
           }
         },
         cart: {
-          type: ProductType,
+          type: new GraphQLList(OrderType),
           args: { id: { type: GraphQLID } },
           resolve(parent, args){
-            Cart.find({'userId':args.id}).then((cart)=>{
-                return Product.findById(cart.productId);
-              });
+            return Cart.find({'userId':args.id});
           }
         }
     }
