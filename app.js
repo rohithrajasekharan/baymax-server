@@ -14,18 +14,16 @@ const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
-var config = require('./config');
 
 app.use(cors({
-  credentials: true,
-  origin: "http://localhost:3000"
+  credentials: true
 }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
-    keys: [config.keys]
+    keys: [process.env.keys]
 }));
 
 app.use(passport.initialize());
@@ -36,7 +34,7 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect(config.dbUrl, () => {
+mongoose.connect(process.env.dbUrl, () => {
     console.log("connected to db");
 });
 

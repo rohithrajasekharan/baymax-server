@@ -9,7 +9,6 @@ const User = require('../models/user-model');
 const Product = require('../models/product');
 const Order = require('../models/orders-model');
 const Cart = require('../models/cart-model');
-const _ = require('lodash');
 
 const {
     GraphQLObjectType,
@@ -162,49 +161,6 @@ const ParticipantType = new GraphQLObjectType({
     })
 });
 
-const ProductType = new GraphQLObjectType({
-    name: 'Product',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        price: { type: GraphQLString },
-        description: { type: GraphQLString },
-        image: {type: GraphQLString},
-        prescription: {type: GraphQLString},
-        caution: {type: GraphQLString},
-        usage: {type: GraphQLString},
-        tags: {type: GraphQLList(GraphQLString)}
-    })
-});
-
-const OrderType = new GraphQLObjectType({
-    name: 'Order',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        product: {
-          type: ProductType,
-          resolve(parent, args){
-              return Product.findById(parent.productId);
-          }
-        },
-        quantity: {type: GraphQLInt},
-        status: {type: GraphQLString}
-    })
-});
-const CartType = new GraphQLObjectType({
-    name: 'Cart',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        product: {
-          type: ProductType,
-          resolve(parent, args){
-              return Product.findById(parent.productId);
-          }
-        }
-    })
-});
-
-
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -266,33 +222,6 @@ const RootQuery = new GraphQLObjectType({
           type: new GraphQLList(ParticipantType),
           resolve(parent, args){
               return Participant.find();
-          }
-        },
-        products: {
-          type: new GraphQLList(ProductType),
-          resolve(parent, args){
-              return Product.find();
-          }
-        },
-        product: {
-          type: ProductType,
-          args: { id: { type: GraphQLID } },
-          resolve(parent, args){
-              return Cart.find({'userId':args.id}).populate('productId');
-          }
-        },
-        orders: {
-          type: new GraphQLList(OrderType),
-          args: { id: { type: GraphQLID } },
-          resolve(parent, args){
-            return Order.find({'userId':args.id});
-          }
-        },
-        cart: {
-          type: new GraphQLList(OrderType),
-          args: { id: { type: GraphQLID } },
-          resolve(parent, args){
-            return Cart.find({'userId':args.id});
           }
         }
     }
@@ -385,51 +314,6 @@ const Mutation = new GraphQLObjectType({
                 });
                 return participant.save();
             }
-        },
-        addToCart: {
-          type: ProductType,
-          args: {
-              userId: { type: new GraphQLNonNull(GraphQLID) },
-              productId:  { type: new GraphQLNonNull(GraphQLID) }
-          },
-          resolve(parent, args){
-              let cart = new Cart({
-                  userId: args.userId,
-                  productId: args.productId
-              });
-              return cart.save();
-          }
-        },
-        addToOrders: {
-          type: ProductType,
-          args: {
-              userId: { type: new GraphQLNonNull(GraphQLID) }
-          },
-          resolve(parent, args){
-            Cart.find({"userId":args.userId}).then((data)=>{
-              data.map((product)=>{
-                let order = new Order({
-                    userId: product.userId,
-                    productId: product.productId,
-                    status: "awaiting confiramtion"
-                });
-                order.save();
-                product.remove();
-              });
-            });
-          }
-        },
-        removeFromCart: {
-          type: ProductType,
-          args: {
-              userId: { type: new GraphQLNonNull(GraphQLID) },
-              productId:  { type: new GraphQLNonNull(GraphQLID) }
-          },
-          resolve(parent, args){
-              Cart.find({"userId":args.userId,"productId":args.productId}).then((product)=>{
-                product.remove();
-              })
-          }
         }
     }
 });
