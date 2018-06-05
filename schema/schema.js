@@ -275,13 +275,19 @@ const RootQuery = new GraphQLObjectType({
             lastId: { type: new GraphQLNonNull(GraphQLID) },
            },
           resolve(parent, args){
-            let data= {
+            let array= {
               article: [],
               question: []
             }
-              data.article.push(Article.find({pageName: args.pageName, _id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit));
-              data.question.push(Question.find({pageName: args.pageName, _id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit));
-              return data;
+              Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit).then((resp)=>{
+                array.article.push(resp);
+              });
+            Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit).then((question)=>{
+              array.question.push(question);
+            }).then(()=>{
+              return array;
+            })
+
           }
         }
     }
