@@ -168,13 +168,23 @@ const FeedType = new GraphQLObjectType({
     name: 'Feed',
     fields: ( ) => ({
         articles: {
-          type: ArticleType,
+          type: new GraphQLList(ArticleType),
+          args: {
+            pageName: { type: GraphQLString },
+            limit: { type: new GraphQLNonNull(GraphQLInt) },
+            lastId: { type: new GraphQLNonNull(GraphQLID) },
+           },
           resolve(parent, args){
               return Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
           }
         },
         questions: {
-          type: QuestionType,
+          type: new GraphQLList(QuestionType),
+          args: {
+            pageName: { type: GraphQLString },
+            limit: { type: new GraphQLNonNull(GraphQLInt) },
+            lastId: { type: new GraphQLNonNull(GraphQLID) },
+           },
           resolve(parent, args){
               return Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
           }
@@ -275,11 +285,6 @@ const RootQuery = new GraphQLObjectType({
         },
         feed: {
           type: FeedType,
-          args: {
-            pageName: { type: GraphQLString },
-            limit: { type: new GraphQLNonNull(GraphQLInt) },
-            lastId: { type: new GraphQLNonNull(GraphQLID) },
-           },
            resolve(parent, args){
                return FeedType;
            }
