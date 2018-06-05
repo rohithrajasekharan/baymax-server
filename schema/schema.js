@@ -343,13 +343,13 @@ const RootQuery = new GraphQLObjectType({
           }
         },
         newMessages: {
-            type: new GraphQLList(MessageType),
+            type: GraphQLInt,
             args: {
               pageName: { type: new GraphQLNonNull(GraphQLString) },
               id: { type: new GraphQLNonNull(GraphQLID) }
              },
             resolve(parent, args){
-              if (args.pageName==="Diabetes") {
+              if (args.pageName=="Diabetes") {
                   return DiabetesMessage.find({_id: {$gt: args.id}}).limit(50).count();
               }else {
                   return BabyandmeMessage.find({_id: {$gt: args.id}}).limit(50).count();

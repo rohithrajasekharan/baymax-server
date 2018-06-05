@@ -14,6 +14,7 @@ const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
+var config = require('./config');
 
 app.use(cors({
   credentials: true,
@@ -24,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
-    keys: [process.env.keys]
+    keys: [config.keys]
 }));
 
 app.use(passport.initialize());
@@ -35,7 +36,7 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect(process.env.dbUrl, () => {
+mongoose.connect(config.dbUrl, () => {
     console.log("connected to db");
 });
 
