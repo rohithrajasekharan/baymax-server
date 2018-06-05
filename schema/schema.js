@@ -175,7 +175,11 @@ const FeedType = new GraphQLObjectType({
             lastId: { type: new GraphQLNonNull(GraphQLID) },
            },
           resolve(parent, args){
+            if (args.lastId="") {
               return Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
+            }else {
+              return Article.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
+            }
           }
         },
         questions: {
@@ -186,8 +190,11 @@ const FeedType = new GraphQLObjectType({
             lastId: { type: new GraphQLNonNull(GraphQLID) },
            },
           resolve(parent, args){
+            if (args.lastId="") {
               return Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
-          }
+            }else {
+              return Question.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
+            }          }
         }
     })
 });
