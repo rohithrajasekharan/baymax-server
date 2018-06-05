@@ -9,6 +9,7 @@ const User = require('../models/user-model');
 const Product = require('../models/product');
 const Order = require('../models/orders-model');
 const Cart = require('../models/cart-model');
+const Bookmark = require('../models/bookmark-model');
 
 const {
     GraphQLObjectType,
@@ -17,8 +18,10 @@ const {
     GraphQLID,
     GraphQLInt,
     GraphQLList,
-    GraphQLNonNull
+    GraphQLNonNull,
+    GraphQLBoolean
 } = graphql;
+
 
 const ArticleType = new GraphQLObjectType({
     name: 'Article',
@@ -161,6 +164,39 @@ const ParticipantType = new GraphQLObjectType({
     })
 });
 
+const FeedType = new GraphQLObjectType({
+    name: 'Feed',
+    fields: ( ) => ({
+        articles: {
+          type: ArticleType
+        },
+        questions: {
+          type: QuestionType
+        }
+    })
+});
+
+const BookmarkType = new GraphQLObjectType({
+    name: 'BookmarkType',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        userId: { type: GraphQLString },
+        articleId: { type: GraphQLString },
+        questionId: { type: GraphQLString },
+        articles: {
+                  type: ArticleType,
+                  resolve(parent, args){
+                      return Article.findById(parent.articleId);
+                  }
+          },
+        questions: {
+          type: QuestionType,
+          resolve(parent, args){
+              return Question.findById(parent.questionId);
+          }
+          }
+    })
+});
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -195,7 +231,7 @@ const RootQuery = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
-                return User.find({}).populate('bookmarks');
+                return User.find({});
             }
         },
         opinions: {
@@ -212,6 +248,13 @@ const RootQuery = new GraphQLObjectType({
                 return Answer.find({questionId: args.id});
             }
         },
+        bookmarks: {
+            type: new GraphQLList(BookmarkType),
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args){
+                return Bookmark.find({userId: args.id});
+            }
+        },
         conversations: {
             type: new GraphQLList(ConversationType),
             resolve(parent, args){
@@ -222,6 +265,23 @@ const RootQuery = new GraphQLObjectType({
           type: new GraphQLList(ParticipantType),
           resolve(parent, args){
               return Participant.find();
+          }
+        },
+        feed: {
+          type: FeedType,
+          args: {
+            pageName: { type: GraphQLString },
+            limit: { type: new GraphQLNonNull(GraphQLInt) },
+            lastId: { type: new GraphQLNonNull(GraphQLID) },
+           },
+          resolve(parent, args){
+            let data= {
+              article: [],
+              question: []
+            }
+              data.article.push(Article.find({pageName: args.pageName, _id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit));
+              data.question.push(Question.find({pageName: args.pageName, _id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit));
+              return data;
           }
         }
     }
@@ -314,7 +374,24 @@ const Mutation = new GraphQLObjectType({
                 });
                 return participant.save();
             }
+        },
+        addBookmark: {
+            type: BookmarkType,
+            args: {
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                articleId:  { type: GraphQLID },
+                questionId: { type: GraphQLID }
+            },
+            resolve(parent, args){
+                let bookmark = new Bookmark({
+                    userId: args.userId,
+                    articleId: args.articleId,
+                    questionId: args.questionId
+                });
+                return bookmark.save();
+            }
         }
+
     }
 });
 
