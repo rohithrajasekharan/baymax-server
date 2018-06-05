@@ -189,7 +189,7 @@ const FeedType = new GraphQLObjectType({
           args: {
             pageName: { type: GraphQLString },
             limit: { type: new GraphQLNonNull(GraphQLInt) },
-            lastId: { type: new GraphQLNonNull(GraphQLID) },
+            lastId: { type: new GraphQLNonNull(GraphQLString) },
            },
           resolve(parent, args){
             if (args.lastId=="") {
@@ -320,9 +320,9 @@ const RootQuery = new GraphQLObjectType({
             args: { pageName: { type: new GraphQLNonNull(GraphQLString) } },
             resolve(parent, args){
               if (args.pageName==="Diabetes") {
-                  return DiabetesMessage.find().limit(50);
+                  return DiabetesMessage.find().limit(50).sort({_id:-1});
               }else {
-                  return BabyandmeMessage.find().limit(50);
+                  return BabyandmeMessage.find().limit(50).sort({_id:-1});
               }
 
             }
@@ -335,21 +335,24 @@ const RootQuery = new GraphQLObjectType({
            },
           resolve(parent, args){
             if (args.pageName==="Diabetes") {
-                return DiabetesMessage.find({_id: {$lt: args.id}}).limit(50);
+                return DiabetesMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
             }else {
-                return BabyandmeMessage.find({_id: {$lt: args.id}}).limit(50);
+                return BabyandmeMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
             }
 
           }
         },
         newMessages: {
             type: new GraphQLList(MessageType),
-            args: { pageName: { type: new GraphQLNonNull(GraphQLString) } },
+            args: {
+              pageName: { type: new GraphQLNonNull(GraphQLString) },
+              id: { type: new GraphQLNonNull(GraphQLID) }
+             },
             resolve(parent, args){
               if (args.pageName==="Diabetes") {
-                  return DiabetesMessage.find().limit(50);
+                  return DiabetesMessage.find({_id: {$gt: args.id}}).limit(50).count();
               }else {
-                  return BabyandmeMessage.find().limit(50);
+                  return BabyandmeMessage.find({_id: {$gt: args.id}}).limit(50).count();
               }
 
             }
