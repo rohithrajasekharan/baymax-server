@@ -3,10 +3,19 @@ const Schema = mongoose.Schema;
 const User = require('../models/user-model');
 
 const MessagesSchema = mongoose.Schema({
-	 conversationId: String,
-	 sendersId: [{type: Schema.Types.ObjectId, ref: 'User'}],
+	 sendersId: String,
+	 username: String,
    message: String,
-	 createdAt: Date
+	 type: String,
+	 replyto: String,
+	 replymessage: String,
+	 time: Date
 });
 
-const Messages = module.exports = mongoose.model('Messages', MessagesSchema);
+const DiabetesMessage = mongoose.model('diabetes_message', MessagesSchema);
+const BabyandmeMessage = mongoose.model('babyandme_message', MessagesSchema);
+
+module.exports = {
+  'DiabetesMessage': DiabetesMessage,
+  'BabyandmeMessage': BabyandmeMessage
+}

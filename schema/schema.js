@@ -10,6 +10,8 @@ const Product = require('../models/product');
 const Order = require('../models/orders-model');
 const Cart = require('../models/cart-model');
 const Bookmark = require('../models/bookmark-model');
+const DiabetesMessage = require('../models/message-model').DiabetesMessage;
+const BabyandmeMessage = require('../models/message-model').BabyandmeMessage;
 
 const {
     GraphQLObjectType,
@@ -220,6 +222,23 @@ const BookmarkType = new GraphQLObjectType({
           }
     })
 });
+const MessageType = new GraphQLObjectType({
+    name: 'Message',
+    fields: ( ) => ({
+        message: { type: GraphQLString },
+        time: { type: GraphQLString },
+        replymessage: { type: GraphQLString },
+        replyto: { type: GraphQLString },
+        type: { type: GraphQLString },
+        username: { type: GraphQLString },
+        sender: {
+            type: UserType,
+            resolve(parent, args){
+                return User.findById(parent.sendersId);
+            }
+        }
+    })
+});
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -295,6 +314,45 @@ const RootQuery = new GraphQLObjectType({
            resolve(parent, args){
                return FeedType;
            }
+        },
+        loadchat: {
+            type: new GraphQLList(MessageType),
+            args: { pageName: { type: new GraphQLNonNull(GraphQLString) } },
+            resolve(parent, args){
+              if (args.pageName==="Diabetes") {
+                  return DiabetesMessage.find().limit(50);
+              }else {
+                  return BabyandmeMessage.find().limit(50);
+              }
+
+            }
+        },
+        oldermessages: {
+          type: new GraphQLList(MessageType),
+          args: {
+            pageName: { type: new GraphQLNonNull(GraphQLString) },
+            id: { type: new GraphQLNonNull(GraphQLID) }
+           },
+          resolve(parent, args){
+            if (args.pageName==="Diabetes") {
+                return DiabetesMessage.find({_id: {$lt: args.id}}).limit(50);
+            }else {
+                return BabyandmeMessage.find({_id: {$lt: args.id}}).limit(50);
+            }
+
+          }
+        },
+        newMessages: {
+            type: new GraphQLList(MessageType),
+            args: { pageName: { type: new GraphQLNonNull(GraphQLString) } },
+            resolve(parent, args){
+              if (args.pageName==="Diabetes") {
+                  return DiabetesMessage.find().limit(50);
+              }else {
+                  return BabyandmeMessage.find().limit(50);
+              }
+
+            }
         }
     }
 });
