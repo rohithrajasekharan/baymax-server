@@ -172,10 +172,10 @@ const FeedType = new GraphQLObjectType({
           args: {
             pageName: { type: GraphQLString },
             limit: { type: new GraphQLNonNull(GraphQLInt) },
-            lastId: { type: new GraphQLNonNull(GraphQLID) },
+            lastId: { type: new GraphQLNonNull(GraphQLString) },
            },
           resolve(parent, args){
-            if (args.lastId="") {
+            if (args.lastId=="") {
               return Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
             }else {
               return Article.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
@@ -190,7 +190,7 @@ const FeedType = new GraphQLObjectType({
             lastId: { type: new GraphQLNonNull(GraphQLID) },
            },
           resolve(parent, args){
-            if (args.lastId="") {
+            if (args.lastId=="") {
               return Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
             }else {
               return Question.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
