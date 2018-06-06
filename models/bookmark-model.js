@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
 const bookmarkSchema = mongoose.Schema({
-	articleId: String,
-  questionId: String,
+	bookmarkId: String,
   userId: String
 });
 
-const Bookmark = module.exports = mongoose.model('Bookmark', bookmarkSchema);
+const articleBookmark =  mongoose.model('articleBookmark', bookmarkSchema);
+const questionBookmark =  mongoose.model('questionBookmark', bookmarkSchema);
+
+module.exports = {
+  'articleBookmark': articleBookmark,
+  'questionBookmark': questionBookmark
+}

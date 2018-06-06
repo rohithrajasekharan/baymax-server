@@ -9,7 +9,8 @@ const User = require('../models/user-model');
 const Product = require('../models/product');
 const Order = require('../models/orders-model');
 const Cart = require('../models/cart-model');
-const Bookmark = require('../models/bookmark-model');
+const articleBookmark = require('../models/bookmark-model').articleBookmark;
+const questionBookmark = require('../models/bookmark-model').questionBookmark;
 const DiabetesMessage = require('../models/message-model').DiabetesMessage;
 const BabyandmeMessage = require('../models/message-model').BabyandmeMessage;
 
@@ -245,7 +246,7 @@ const RootQuery = new GraphQLObjectType({
             }
         },
         question: {
-            type: new GraphQLList(QuestionType),
+            type: QuestionType,
             args: { id: { type: GraphQLString } },
             resolve(parent, args){
                 return Question.findById(args.id);
@@ -271,11 +272,18 @@ const RootQuery = new GraphQLObjectType({
                 return Answer.find({questionId: args.id});
             }
         },
-        bookmarks: {
+        articleBookmarks: {
             type: new GraphQLList(BookmarkType),
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
-                return Bookmark.find({userId: args.id});
+                return articleBookmark.find({userId: args.id});
+            }
+        },
+        questionBookmarks: {
+            type: new GraphQLList(BookmarkType),
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args){
+                return questionBookmark.find({userId: args.id});
             }
         },
         feed: {
