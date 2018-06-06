@@ -176,24 +176,29 @@ const FeedType = new GraphQLObjectType({
     })
 });
 
-const BookmarkType = new GraphQLObjectType({
-    name: 'BookmarkType',
+const articleBookmarkType = new GraphQLObjectType({
+    name: 'articleBookmark',
     fields: ( ) => ({
         id: { type: GraphQLID },
         userId: { type: GraphQLString },
-        articleId: { type: GraphQLID },
-        questionId: { type: GraphQLID },
         articles: {
                   type: ArticleType,
                   resolve(parent, args){
-                      return Article.findById(parent.articleId);
+                      return Article.findById(parent.bookmarkId);
                   }
-          },
-        questions: {
-          type: QuestionType,
-          resolve(parent, args){
-              return Question.findById(parent.questionId);
           }
+    })
+});
+const questionBookmarkType = new GraphQLObjectType({
+    name: 'questionBookmark',
+    fields: ( ) => ({
+        id: { type: GraphQLID },
+        userId: { type: GraphQLString },
+        questions: {
+                  type: QuestionType,
+                  resolve(parent, args){
+                      return Question.findById(parent.bookmarkId);
+                  }
           }
     })
 });
@@ -240,9 +245,9 @@ const RootQuery = new GraphQLObjectType({
         },
         questions: {
             type: new GraphQLList(QuestionType),
-            args: { id: { type: GraphQLString } },
+            args: { pageName: { type: GraphQLString } },
             resolve(parent, args){
-                return Question.find({pageName: args.id}).sort({_id:-1});
+                return Question.find({pageName: args.pageName}).sort({_id:-1});
             }
         },
         question: {
@@ -273,14 +278,14 @@ const RootQuery = new GraphQLObjectType({
             }
         },
         articleBookmarks: {
-            type: new GraphQLList(BookmarkType),
+            type: new GraphQLList(articleBookmarkType),
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
                 return articleBookmark.find({userId: args.id});
             }
         },
         questionBookmarks: {
-            type: new GraphQLList(BookmarkType),
+            type: new GraphQLList(questionBookmarkType),
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
                 return questionBookmark.find({userId: args.id});
@@ -418,19 +423,35 @@ const Mutation = new GraphQLObjectType({
             }
         },
         addBookmark: {
-            type: BookmarkType,
+            type: GraphQLString,
             args: {
                 userId: { type: new GraphQLNonNull(GraphQLID) },
-                articleId:  { type: GraphQLID },
-                questionId: { type: GraphQLID }
+                articleId:  { type: GraphQLString },
+                questionId: { type: GraphQLString }
             },
             resolve(parent, args){
-                let bookmark = new Bookmark({
+              if (args.articleId=="") {
+                let bookmark = new questionBookmark({
                     userId: args.userId,
-                    articleId: args.articleId,
-                    questionId: args.questionId
+                    bookmarkId: args.questionId
                 });
-                return bookmark.save();
+                return new Promise((resolve,reject)=>{
+              bookmark.save().then(()=>{
+              resolve('Success')
+              })
+       })
+              }else if (args.questionId==""){
+                let bookmark = new articleBookmark({
+                    userId: args.userId,
+                    bookmarkId: args.articleId
+                });
+                return new Promise((resolve,reject)=>{
+              bookmark.save().then(()=>{
+              resolve('Success')
+              })
+       })
+              }
+
             }
         }
 
