@@ -57,6 +57,8 @@ const OpinionType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         message: { type: GraphQLString },
+        articleId: { type: GraphQLString },
+        userId: { type: GraphQLString },
         article: {
             type: ArticleType,
             resolve(parent, args){
@@ -178,8 +180,8 @@ const BookmarkType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         userId: { type: GraphQLString },
-        articleId: { type: GraphQLString },
-        questionId: { type: GraphQLString },
+        articleId: { type: GraphQLID },
+        questionId: { type: GraphQLID },
         articles: {
                   type: ArticleType,
                   resolve(parent, args){
@@ -366,11 +368,12 @@ const Mutation = new GraphQLObjectType({
                     articleId: args.articleId,
                     userId: args.userId
                 });
-                return Opinion.create(opinion,(err, data)=>{
-                  Article.findOneAndUpdate({_id :args.articleId}, {$inc : {'comments' : 1}});
-                })
-
-            }
+                return new Promise((resolve,reject)=>{
+              Article.update({_id :args.articleId}, {$inc : {'comments' : 1}}).then(()=>{
+              resolve(opinion.save())
+              })
+       })
+     }
         },
         addQuestion: {
             type: QuestionType,
