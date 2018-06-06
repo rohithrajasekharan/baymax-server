@@ -419,7 +419,7 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent, args){
                 return new Promise((resolve,reject)=>{
-              Article.findOneAndUpdate({_id :args.articleId}, { $push: { 'likedby': args.userId } }).then((data)=>{
+              Article.findOneAndUpdate({_id :args.articleId}, {$inc : {'likes' : 1}, $push: { 'likedby': args.userId } }).then((data)=>{
               resolve('Success')
               })
        })
