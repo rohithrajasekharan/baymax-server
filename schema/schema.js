@@ -49,7 +49,8 @@ const ArticleType = new GraphQLObjectType({
             resolve(parent, args){
                 return Opinion.find({ articleId: parent.id });
             }
-        }
+        },
+        likedby: { type: new GraphQLList(UserType) }
     })
 });
 
@@ -71,7 +72,9 @@ const OpinionType = new GraphQLObjectType({
           resolve(parent, args){
               return User.findById(parent.userId);
           }
-        }
+        },
+        articleBookmark: { type: new GraphQLList(ArticleType) },
+        questionBookmark: { type: new GraphQLList(QuestionType) }
     })
 });
 
@@ -136,7 +139,9 @@ const UserType = new GraphQLObjectType({
                   resolve(parent, args){
                       return Question.find({ userId: parent.id });
                   }
-          }
+          },
+          articlebookmark: { type: new GraphQLList(ArticleType) },
+          questionbookmark: { type: new GraphQLList(QuestionType) }
     })
 });
 
@@ -176,32 +181,6 @@ const FeedType = new GraphQLObjectType({
     })
 });
 
-const articleBookmarkType = new GraphQLObjectType({
-    name: 'articleBookmark',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        userId: { type: GraphQLString },
-        articles: {
-                  type: ArticleType,
-                  resolve(parent, args){
-                      return Article.findById(parent.bookmarkId);
-                  }
-          }
-    })
-});
-const questionBookmarkType = new GraphQLObjectType({
-    name: 'questionBookmark',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        userId: { type: GraphQLString },
-        questions: {
-                  type: QuestionType,
-                  resolve(parent, args){
-                      return Question.findById(parent.bookmarkId);
-                  }
-          }
-    })
-});
 const MessageType = new GraphQLObjectType({
     name: 'Message',
     fields: ( ) => ({
@@ -226,21 +205,21 @@ const RootQuery = new GraphQLObjectType({
             type: ArticleType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
-                return Article.findById(args.id);
+                return Article.findById(args.id).populate('likedby');
             }
         },
         user: {
             type: UserType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
-                return User.findById(args.id);
+                return User.findById(args.id).populate('articlebookmark').populate('questionbookmark');
             }
         },
         articles: {
           type: new GraphQLList(ArticleType),
           args: { pageName: { type: GraphQLString } },
           resolve(parent, args){
-              return Article.find({pageName: args.pageName}).sort({_id:-1});
+              return Article.find({pageName: args.pageName}).sort({_id:-1}).populate('likedby');
           }
         },
         questions: {
@@ -260,7 +239,7 @@ const RootQuery = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
-                return User.find({});
+                return User.find({}).populate('articlebookmark').populate('questionbookmark');
             }
         },
         opinions: {
@@ -275,20 +254,6 @@ const RootQuery = new GraphQLObjectType({
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
                 return Answer.find({questionId: args.id});
-            }
-        },
-        articleBookmarks: {
-            type: new GraphQLList(articleBookmarkType),
-            args: { id: { type: GraphQLID } },
-            resolve(parent, args){
-                return articleBookmark.find({userId: args.id});
-            }
-        },
-        questionBookmarks: {
-            type: new GraphQLList(questionBookmarkType),
-            args: { id: { type: GraphQLID } },
-            resolve(parent, args){
-                return questionBookmark.find({userId: args.id});
             }
         },
         feed: {
@@ -426,32 +391,38 @@ const Mutation = new GraphQLObjectType({
             type: GraphQLString,
             args: {
                 userId: { type: new GraphQLNonNull(GraphQLID) },
-                articleId:  { type: GraphQLString },
-                questionId: { type: GraphQLString }
+                articleId:  { type: GraphQLID },
+                questionId: { type: GraphQLID }
             },
             resolve(parent, args){
               if (args.articleId=="") {
-                let bookmark = new questionBookmark({
-                    userId: args.userId,
-                    bookmarkId: args.questionId
-                });
                 return new Promise((resolve,reject)=>{
-              bookmark.save().then(()=>{
+              User.findOneAndUpdate({_id :args.userId}, { $push: { 'questionbookmark': args.questionId } }).then((data)=>{
               resolve('Success')
               })
        })
               }else if (args.questionId==""){
-                let bookmark = new articleBookmark({
-                    userId: args.userId,
-                    bookmarkId: args.articleId
-                });
                 return new Promise((resolve,reject)=>{
-              bookmark.save().then(()=>{
+              User.findOneAndUpdate({_id :args.userId}, {$push : {'articlebookmark ': args.articleId}}).then((data)=>{
               resolve('Success')
               })
        })
               }
 
+            }
+        },
+        likearticle: {
+            type: GraphQLString,
+            args: {
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                articleId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args){
+                return new Promise((resolve,reject)=>{
+              Article.findOneAndUpdate({_id :args.articleId}, { $push: { 'likedby': args.userId } }).then((data)=>{
+              resolve('Success')
+              })
+       })
             }
         }
 
