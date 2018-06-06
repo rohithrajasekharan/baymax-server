@@ -34,6 +34,9 @@ const ArticleType = new GraphQLObjectType({
         pageName: { type: GraphQLString },
         videoId: {type: GraphQLString},
         imageId: {type: GraphQLString},
+        likes: {type: GraphQLInt},
+        comments: {type: GraphQLInt},
+        createdAt: {type: GraphQLString},
         author: {
             type: UserType,
             resolve(parent, args){
@@ -94,6 +97,7 @@ const QuestionType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         question: { type: GraphQLString },
+        description: { type: GraphQLString },
         pageName: { type: GraphQLString },
         author: {
           type: UserType,
@@ -133,38 +137,6 @@ const UserType = new GraphQLObjectType({
     })
 });
 
-const ConversationType = new GraphQLObjectType({
-    name: 'Conversation',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        type: { type: GraphQLString },
-        participants: {
-                  type: new GraphQLList(ParticipantType),
-                  resolve(parent, args){
-                      return Participant.find({ conversationId: parent.id });
-                  }
-          }
-    })
-});
-
-const ParticipantType = new GraphQLObjectType({
-    name: 'Participant',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        userinfo: {
-          type: UserType,
-          resolve(parent, args){
-              return User.findById(parent.userId);
-          }
-        },
-        conversations: {
-          type: ConversationType,
-          resolve(parent, args){
-              return Conversation.findById(parent.conversationId);
-          }
-        }
-    })
-});
 
 const FeedType = new GraphQLObjectType({
     name: 'Feed',
@@ -180,7 +152,7 @@ const FeedType = new GraphQLObjectType({
             if (args.lastId=="") {
               return Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
             }else {
-              return Article.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
+              return Article.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
             }
           }
         },
@@ -195,7 +167,7 @@ const FeedType = new GraphQLObjectType({
             if (args.lastId=="") {
               return Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
             }else {
-              return Question.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).limit(args.limit);
+              return Question.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
             }          }
         }
     })
@@ -270,6 +242,13 @@ const RootQuery = new GraphQLObjectType({
                 return Question.find({pageName: args.id}).sort({_id:-1});
             }
         },
+        question: {
+            type: new GraphQLList(QuestionType),
+            args: { id: { type: GraphQLString } },
+            resolve(parent, args){
+                return Question.findById(args.id);
+            }
+        },
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
@@ -296,18 +275,6 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 return Bookmark.find({userId: args.id});
             }
-        },
-        conversations: {
-            type: new GraphQLList(ConversationType),
-            resolve(parent, args){
-                return Conversation.find();
-            }
-        },
-        participants: {
-          type: new GraphQLList(ParticipantType),
-          resolve(parent, args){
-              return Participant.find();
-          }
         },
         feed: {
           type: FeedType,
@@ -380,7 +347,8 @@ const Mutation = new GraphQLObjectType({
                     pageName: args.pageName,
                     userId: args.userId,
                     videoId: args.videoId,
-                    imageId: args.imageId
+                    imageId: args.imageId,
+                    createdAt: Date.now()
                 });
                 return article.save();
             }
@@ -398,20 +366,24 @@ const Mutation = new GraphQLObjectType({
                     articleId: args.articleId,
                     userId: args.userId
                 });
-                return opinion.save();
+                return Opinion.create(opinion,(err, data)=>{
+                  Article.findOneAndUpdate({_id :args.articleId}, {$inc : {'comments' : 1}});
+                })
+
             }
         },
-
         addQuestion: {
             type: QuestionType,
             args: {
                 question: { type: new GraphQLNonNull(GraphQLString) },
+                description: { type: GraphQLString },
                 userId: { type: new GraphQLNonNull(GraphQLID) },
                 pageName: { type: new GraphQLNonNull(GraphQLString) },
             },
             resolve(parent, args){
                 let question = new Question({
                     question: args.question,
+                    description: args.description,
                     userId: args.userId,
                     pageName: args.pageName
                 });
@@ -432,20 +404,6 @@ const Mutation = new GraphQLObjectType({
                     userId: args.userId
                 });
                 return answer.save();
-            }
-        },
-        addParticipant: {
-            type: ParticipantType,
-            args: {
-                userId: { type: new GraphQLNonNull(GraphQLID) },
-                conversationId:  { type: new GraphQLNonNull(GraphQLID) }
-            },
-            resolve(parent, args){
-                let participant = new Participant({
-                    userId: args.userId,
-                    conversationId: args.conversationId
-                });
-                return participant.save();
             }
         },
         addBookmark: {
