@@ -401,9 +401,9 @@ const Mutation = new GraphQLObjectType({
               resolve('Success')
               })
        })
-              }else if (args.questionId==""){
+              }else{
                 return new Promise((resolve,reject)=>{
-              User.findOneAndUpdate({_id :args.userId}, {$push : {'articlebookmark ': args.articleId}}).then((data)=>{
+              User.findOneAndUpdate({_id :args.userId}, { $push: { 'articlebookmark': args.articleId } }).then((data)=>{
               resolve('Success')
               })
        })
