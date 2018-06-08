@@ -12,6 +12,7 @@ const UserSchema = mongoose.Schema({
 		sparse: true
 	},
   password: String,
+	isDoc: Boolean,
   googleId: String,
 	facebookId: String,
 	avatar: String,

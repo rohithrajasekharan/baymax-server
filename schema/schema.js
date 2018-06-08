@@ -128,6 +128,7 @@ const UserType = new GraphQLObjectType({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
         email: { type: GraphQLString },
+        isDoc: { type: GraphQLBoolean },
         logintype: { type: GraphQLString },
         articles: {
             type: new GraphQLList(ArticleType),
@@ -448,14 +449,20 @@ const Mutation = new GraphQLObjectType({
               if (args.type=='upvote') {
                 return new Promise((resolve,reject)=>{
               Answer.findOneAndUpdate({_id :args.answerId}, {$inc : {'votes' : 1}}).then((data)=>{
-              resolve('Success')
+                User.findById(args.userId).then((user)=>{
+                  if (user.isDoc) {
+                    resolve('upvoted by doctor')
+                  }else {
+                    resolve('upvoted')
+                  }
+                })
               })
        })
               }
               else if (args.type=='downvote') {
                 return new Promise((resolve,reject)=>{
-              Answer.findOneAndUpdate({_id :args.answerId}, {$dec : {'votes' : 1}}).then((data)=>{
-              resolve('Success')
+              Answer.findOneAndUpdate({_id :args.answerId}, {$inc : {'votes' : -1}}).then((data)=>{
+              resolve('Downvoted')
               })
        })
               }
