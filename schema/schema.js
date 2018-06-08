@@ -89,6 +89,7 @@ const AnswerType = new GraphQLObjectType({
                 return Question.findById(parent.questionId);
             }
         },
+        votes: { type: GraphQLInt },
         user: {
           type: UserType,
           resolve(parent, args){
@@ -415,14 +416,50 @@ const Mutation = new GraphQLObjectType({
             type: GraphQLString,
             args: {
                 userId: { type: new GraphQLNonNull(GraphQLID) },
-                articleId: { type: new GraphQLNonNull(GraphQLID) }
+                articleId: { type: new GraphQLNonNull(GraphQLID) },
+                type: { type: new GraphQLNonNull(GraphQLString) }
             },
             resolve(parent, args){
+              if (args.type=='like') {
                 return new Promise((resolve,reject)=>{
               Article.findOneAndUpdate({_id :args.articleId}, {$inc : {'likes' : 1}, $push: { 'likedby': args.userId } }).then((data)=>{
               resolve('Success')
               })
        })
+              }
+              else if (args.type=='dislike') {
+                return new Promise((resolve,reject)=>{
+              Article.findOneAndUpdate({_id :args.articleId}, {$inc : {'likes' : -1}, $pull: { 'likedby': args.userId } }).then((data)=>{
+              resolve('Success')
+              })
+       })
+              }
+
+            }
+        },
+        voteanswer: {
+            type: GraphQLString,
+            args: {
+                userId: { type: new GraphQLNonNull(GraphQLID) },
+                answerId: { type: new GraphQLNonNull(GraphQLID) },
+                type: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parent, args){
+              if (args.type=='upvote') {
+                return new Promise((resolve,reject)=>{
+              Answer.findOneAndUpdate({_id :args.answerId}, {$inc : {'votes' : 1}}).then((data)=>{
+              resolve('Success')
+              })
+       })
+              }
+              else if (args.type=='downvote') {
+                return new Promise((resolve,reject)=>{
+              Answer.findOneAndUpdate({_id :args.answerId}, {$dec : {'votes' : 1}}).then((data)=>{
+              resolve('Success')
+              })
+       })
+              }
+
             }
         }
 
