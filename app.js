@@ -15,10 +15,7 @@ const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors({
-  credentials: true,
-  origin: "http://localhost:3000"
-}));
+app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
