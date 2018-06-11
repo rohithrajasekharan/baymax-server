@@ -13,7 +13,7 @@ const articleBookmark = require('../models/bookmark-model').articleBookmark;
 const questionBookmark = require('../models/bookmark-model').questionBookmark;
 const DiabetesMessage = require('../models/message-model').DiabetesMessage;
 const BabyandmeMessage = require('../models/message-model').BabyandmeMessage;
-
+var ObjectId = require('mongodb').ObjectID;
 const {
     GraphQLObjectType,
     GraphQLString,
@@ -50,7 +50,14 @@ const ArticleType = new GraphQLObjectType({
                 return Opinion.find({ articleId: parent.id });
             }
         },
-        likedby: { type: new GraphQLList(UserType) }
+        likedby: { type: new GraphQLList(GraphQLID) },
+        isliked: {
+          type: GraphQLBoolean,
+          args: {userId: { type: GraphQLID }},
+          resolve(parent, args){
+return (parent.likedby.indexOf(args.userId)>-1);
+          }
+        }
     })
 });
 
@@ -207,21 +214,21 @@ const RootQuery = new GraphQLObjectType({
             type: ArticleType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
-                return Article.findById(args.id).populate('likedby');
+                return Article.findById(args.id);
             }
         },
         user: {
             type: UserType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args){
-                return User.findById(args.id).populate('articlebookmark').populate('questionbookmark');
+                return User.findById(args.id).populate('articlebookmark');
             }
         },
         articles: {
           type: new GraphQLList(ArticleType),
           args: { pageName: { type: GraphQLString } },
           resolve(parent, args){
-              return Article.find({pageName: args.pageName}).sort({_id:-1}).populate('likedby');
+              return Article.find({pageName: args.pageName}).sort({_id:-1});
           }
         },
         questions: {
@@ -468,7 +475,69 @@ const Mutation = new GraphQLObjectType({
               }
 
             }
-        }
+        },
+        removeOpinion: {
+            type: GraphQLString,
+            args: {
+                opinionId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args){
+                return new Promise((resolve,reject)=>{
+            Opinion.findById(args.opinionId).then((opinion)=>{
+              Article.findOneAndUpdate({_id :opinion.articleId}, {$inc : {'comments' : -1}}).then(()=>{
+              opinion.remove().then(()=>{
+                resolve('opinion removed')
+              })
+              })
+            })
+       })
+     }
+   },
+   removeArticle: {
+       type: GraphQLString,
+       args: {
+           articleId: { type: new GraphQLNonNull(GraphQLID) }
+       },
+       resolve(parent, args){
+           return new Promise((resolve,reject)=>{
+       Article.findById(args.articleId).then((article)=>{
+         article.remove().then(()=>{
+           resolve('Article removed')
+         })
+       })
+  })
+}
+},
+removeQuestion: {
+    type: GraphQLString,
+    args: {
+        questionId: { type: new GraphQLNonNull(GraphQLID) }
+    },
+    resolve(parent, args){
+        return new Promise((resolve,reject)=>{
+    Question.findById(args.questionId).then((question)=>{
+      question.remove().then(()=>{
+        resolve('Question removed')
+      })
+    })
+})
+}
+},
+removeAnswer: {
+    type: GraphQLString,
+    args: {
+        answerId: { type: new GraphQLNonNull(GraphQLID) }
+    },
+    resolve(parent, args){
+        return new Promise((resolve,reject)=>{
+    Answer.findById(args.answerId).then((answer)=>{
+      answer.remove().then(()=>{
+        resolve('Answer removed')
+      })
+    })
+})
+}
+}
 
     }
 });
