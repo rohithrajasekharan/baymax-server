@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
-    keys: [process.env.keys]
+    keys: [process.en.keys]
 }));
 
 app.use(passport.initialize());
@@ -35,7 +35,7 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect(process.env.dbUrl, () => {
+mongoose.connect(process.en.dbUrl, () => {
     console.log("connected to db");
 });
 

@@ -4,7 +4,8 @@ const QuestionSchema = mongoose.Schema({
 	question: String,
 	description: String,
   userId: String,
-	pageName: String
+	pageName: String,
+	createdAt: Date
 });
 
 const Question = module.exports = mongoose.model('Question', QuestionSchema);

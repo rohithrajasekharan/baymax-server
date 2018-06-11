@@ -3,8 +3,6 @@ const Article = require('../models/article-model');
 const Opinion = require('../models/comment-model');
 const Answer = require('../models/answer-model');
 const Question = require('../models/question-model');
-const Participant = require('../models/participant-model');
-const Conversation = require('../models/conversation-model');
 const User = require('../models/user-model');
 const Product = require('../models/product');
 const Order = require('../models/orders-model');
@@ -353,7 +351,8 @@ const Mutation = new GraphQLObjectType({
                 let opinion = new Opinion({
                     message: args.message,
                     articleId: args.articleId,
-                    userId: args.userId
+                    userId: args.userId,
+                    createdAt: Date.now()
                 });
                 return new Promise((resolve,reject)=>{
               Article.update({_id :args.articleId}, {$inc : {'comments' : 1}}).then(()=>{
@@ -375,7 +374,8 @@ const Mutation = new GraphQLObjectType({
                     question: args.question,
                     description: args.description,
                     userId: args.userId,
-                    pageName: args.pageName
+                    pageName: args.pageName,
+                    createdAt: Date.now()
                 });
                 return question.save();
             }
@@ -391,7 +391,8 @@ const Mutation = new GraphQLObjectType({
                 let answer = new Answer({
                     answer: args.answer,
                     questionId: args.questionId,
-                    userId: args.userId
+                    userId: args.userId,
+                    createdAt: Date.now()
                 });
                 return answer.save();
             }
@@ -401,23 +402,38 @@ const Mutation = new GraphQLObjectType({
             args: {
                 userId: { type: new GraphQLNonNull(GraphQLID) },
                 articleId:  { type: GraphQLID },
-                questionId: { type: GraphQLID }
+                questionId: { type: GraphQLID },
+                type: { type: GraphQLString }
             },
             resolve(parent, args){
-              if (args.articleId=="") {
+              if (args.articleId=="" && args.type=="add") {
                 return new Promise((resolve,reject)=>{
               User.findOneAndUpdate({_id :args.userId}, { $push: { 'questionbookmark': args.questionId } }).then((data)=>{
-              resolve('Success')
+                resolve('Added Question to bookmark')
               })
        })
-              }else{
+     }
+     else if (args.questionId=="" && args.type=="add"){
                 return new Promise((resolve,reject)=>{
               User.findOneAndUpdate({_id :args.userId}, { $push: { 'articlebookmark': args.articleId } }).then((data)=>{
-              resolve('Success')
+              resolve('Added Article to bookmark')
               })
        })
               }
-
+              else if (args.articleId=="" && args.type=="remove"){
+                         return new Promise((resolve,reject)=>{
+                       User.findOneAndUpdate({_id :args.userId}, { $pull: { 'questionbookmark': args.questionId} }).then((data)=>{
+                       resolve('Removed Question from bookmark')
+                       })
+                })
+                       }
+                       else if (args.questionId=="" && args.type=="remove"){
+                                  return new Promise((resolve,reject)=>{
+                                User.findOneAndUpdate({_id :args.userId}, { $pull: { 'articlebookmark': args.articleId } }).then((data)=>{
+                                resolve('Removed Article from bookmark')
+                                })
+                         })
+                                }
             }
         },
         likearticle: {
