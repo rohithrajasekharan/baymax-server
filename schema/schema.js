@@ -35,7 +35,16 @@ const ArticleType = new GraphQLObjectType({
         imageId: {type: GraphQLString},
         likes: {type: GraphQLInt},
         comments: {type: GraphQLInt},
-        createdAt: {type: GraphQLString},
+        createdAt: {
+          type: GraphQLString,
+          resolve(parent, args){
+            var today = new Date(parent.createdAt);
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+            return (dd+" "+mm+" "+yyyy);
+        }
+      },
         author: {
             type: UserType,
             resolve(parent, args){
@@ -408,14 +417,16 @@ const Mutation = new GraphQLObjectType({
             resolve(parent, args){
               if (args.articleId=="" && args.type=="add") {
                 return new Promise((resolve,reject)=>{
-              User.findOneAndUpdate({_id :args.userId}, { $push: { 'questionbookmark': args.questionId } }).then((data)=>{
-                resolve('Added Question to bookmark')
+              User.findOneAndUpdate({_id :args.userId}, { $addToSet: { 'questionbookmark': args.questionId } }).then((data)=>{
+      console.log(data);
+      resolve('Added Question to bookmark')
               })
        })
      }
      else if (args.questionId=="" && args.type=="add"){
                 return new Promise((resolve,reject)=>{
-              User.findOneAndUpdate({_id :args.userId}, { $push: { 'articlebookmark': args.articleId } }).then((data)=>{
+              User.findOneAndUpdate({_id :args.userId}, { $addToSet: { 'articlebookmark': args.articleId } }).then((data)=>{
+              console.log(data);
               resolve('Added Article to bookmark')
               })
        })

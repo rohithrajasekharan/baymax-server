@@ -18,8 +18,8 @@ const UserSchema = mongoose.Schema({
 	avatar: String,
   logintype: String,
 	lasttimestamp: Date,
-	articlebookmark: [{type: Schema.Types.ObjectId,unique: true, ref: 'Article'}],
-	questionbookmark: [{type: Schema.Types.ObjectId,unique: true, ref: 'Question'}]
+	articlebookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}],
+	questionbookmark: [{type: Schema.Types.ObjectId, ref: 'Question'}]
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);
