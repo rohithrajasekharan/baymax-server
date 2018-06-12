@@ -156,8 +156,25 @@ const UserType = new GraphQLObjectType({
                       return Question.find({ userId: parent.id });
                   }
           },
-          articlebookmark: { type: new GraphQLList(ArticleType) },
-          questionbookmark: { type: new GraphQLList(QuestionType) }
+          articlebookmark: {
+            type: new GraphQLList(ArticleType),
+            args: {
+              limit: { type: new GraphQLNonNull(GraphQLInt) },
+              lastId: { type: new GraphQLNonNull(GraphQLString) },
+             },
+               resolve(parent, args){
+             return parent.articlebookmark.limit(args.limit);
+           }
+         },
+          questionbookmark: { type: new GraphQLList(QuestionType),
+            args: {
+              limit: { type: new GraphQLNonNull(GraphQLInt) },
+              lastId: { type: new GraphQLNonNull(GraphQLString) },
+             },
+               resolve(parent, args){
+             return parent.questionbookmark.limit(args.limit);
+           }
+         }
     })
 });
 
@@ -226,9 +243,12 @@ const RootQuery = new GraphQLObjectType({
         },
         user: {
             type: UserType,
-            args: { id: { type: GraphQLID } },
+            args: {
+              id: { type: GraphQLID },
+              skip: { type: GraphQLInt },
+            },
             resolve(parent, args){
-                return User.findById(args.id).populate('articlebookmark');
+                return User.find({_id: args.id, articlebookmark: { $slice: [ args.skip, 10 ] }, questionbookmark: { $slice: [ args.skip, 10 ] } }).populate('articlebookmark').populate('questionBookmark');
             }
         },
         articles: {
@@ -255,19 +275,29 @@ const RootQuery = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
-                return User.find({}).populate('articlebookmark').populate('questionbookmark');
+                return User.find().populate('articlebookmark').populate('questionbookmark');
             }
         },
         opinions: {
             type: new GraphQLList(OpinionType),
-            args: { id: { type: GraphQLID } },
+            args: {
+               id: { type: GraphQLID },
+               limit: { type: new GraphQLNonNull(GraphQLInt) },
+               lastId: { type: new GraphQLNonNull(GraphQLString) }
+           },
             resolve(parent, args){
-                return Opinion.find({articleId: args.id});
+              if (args.lastId=="") {
+                return Opinion.find({articleId: args.id}).sort({_id:-1}).limit(args.limit);
+              }else {
+                return Opinion.find({articleId: args.id ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
+              }
             }
         },
         answers: {
             type: new GraphQLList(AnswerType),
-            args: { id: { type: GraphQLID } },
+            args: { id: { type: GraphQLID },
+            limit: { type: new GraphQLNonNull(GraphQLInt) },
+            lastId: { type: new GraphQLNonNull(GraphQLString) } },
             resolve(parent, args){
                 return Answer.find({questionId: args.id});
             }
