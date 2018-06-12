@@ -86,9 +86,7 @@ const OpinionType = new GraphQLObjectType({
           resolve(parent, args){
               return User.findById(parent.userId);
           }
-        },
-        articleBookmark: { type: new GraphQLList(ArticleType) },
-        questionBookmark: { type: new GraphQLList(QuestionType) }
+        }
     })
 });
 
@@ -156,25 +154,8 @@ const UserType = new GraphQLObjectType({
                       return Question.find({ userId: parent.id });
                   }
           },
-          articlebookmark: {
-            type: new GraphQLList(ArticleType),
-            args: {
-              limit: { type: new GraphQLNonNull(GraphQLInt) },
-              lastId: { type: new GraphQLNonNull(GraphQLString) },
-             },
-               resolve(parent, args){
-             return parent.articlebookmark.limit(args.limit);
-           }
-         },
-          questionbookmark: { type: new GraphQLList(QuestionType),
-            args: {
-              limit: { type: new GraphQLNonNull(GraphQLInt) },
-              lastId: { type: new GraphQLNonNull(GraphQLString) },
-             },
-               resolve(parent, args){
-             return parent.questionbookmark.limit(args.limit);
-           }
-         }
+          articlebookmark: {  type: new GraphQLList(ArticleType) },
+          questionbookmark: { type: new GraphQLList(QuestionType) }
     })
 });
 
@@ -248,7 +229,7 @@ const RootQuery = new GraphQLObjectType({
               skip: { type: GraphQLInt },
             },
             resolve(parent, args){
-                return User.find({_id: args.id, articlebookmark: { $slice: [ args.skip, 10 ] }, questionbookmark: { $slice: [ args.skip, 10 ] } }).populate('articlebookmark').populate('questionBookmark');
+                return User.findById(args.id).populate({path: 'articlebookmark', options: { limit: 10, skip: args.skip }}).populate({path: 'questionbookmark', options: { limit: 10, skip: args.skip }});
             }
         },
         articles: {
@@ -283,14 +264,10 @@ const RootQuery = new GraphQLObjectType({
             args: {
                id: { type: GraphQLID },
                limit: { type: new GraphQLNonNull(GraphQLInt) },
-               lastId: { type: new GraphQLNonNull(GraphQLString) }
+               skip: { type: new GraphQLNonNull(GraphQLInt) }
            },
             resolve(parent, args){
-              if (args.lastId=="") {
-                return Opinion.find({articleId: args.id}).sort({_id:-1}).limit(args.limit);
-              }else {
-                return Opinion.find({articleId: args.id ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
-              }
+              return Opinion.find({articleId: args.id}).sort({_id:-1}).skip(args.skip).limit(args.limit);
             }
         },
         answers: {
