@@ -141,6 +141,7 @@ const UserType = new GraphQLObjectType({
         name: { type: GraphQLString },
         email: { type: GraphQLString },
         isDoc: { type: GraphQLBoolean },
+        avatar: {type: GraphQLString},
         logintype: { type: GraphQLString },
         articles: {
             type: new GraphQLList(ArticleType),
