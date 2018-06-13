@@ -34,7 +34,12 @@ const ArticleType = new GraphQLObjectType({
         videoId: {type: GraphQLString},
         imageId: {type: GraphQLString},
         likes: {type: GraphQLInt},
-        comments: {type: GraphQLInt},
+        comments: {
+            type: GraphQLInt,
+            resolve(parent, args){
+                return Opinion.find({ articleId: parent.id }).count();
+            }
+        },
         createdAt: {
           type: GraphQLString,
           resolve(parent, args){
@@ -123,6 +128,12 @@ const QuestionType = new GraphQLObjectType({
           resolve(parent, args){
               return User.findById(parent.userId);
           }
+        },
+        answercount: {
+            type: GraphQLInt,
+            resolve(parent, args){
+                return Answer.find({ questionId: parent.id }).count();
+            }
         },
         answers: {
             type: new GraphQLList(AnswerType),
@@ -371,12 +382,8 @@ const Mutation = new GraphQLObjectType({
                     userId: args.userId,
                     createdAt: Date.now()
                 });
-                return new Promise((resolve,reject)=>{
-              Article.update({_id :args.articleId}, {$inc : {'comments' : 1}}).then(()=>{
-              resolve(opinion.save())
-              })
-       })
-     }
+              return opinion.save();
+       }
         },
         addQuestion: {
             type: QuestionType,
