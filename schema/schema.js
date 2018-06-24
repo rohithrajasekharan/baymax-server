@@ -42,7 +42,7 @@ const ArticleType = new GraphQLObjectType({
             var dd = today.getDate();
             var mm = today.getMonth()+1;
             var yyyy = today.getFullYear();
-            return (dd+" "+mm+" "+yyyy);
+            return (dd+"-"+mm+"-"+yyyy);
         }
       },
         author: {
@@ -53,8 +53,16 @@ const ArticleType = new GraphQLObjectType({
         },
         opinions: {
             type: new GraphQLList(OpinionType),
+            args: {
+              limit: { type: new GraphQLNonNull(GraphQLInt) },
+              lastId: { type: new GraphQLNonNull(GraphQLString) },
+             },
             resolve(parent, args){
-                return Opinion.find({ articleId: parent.id });
+              if (args.lastId=="") {
+                return Opinion.find({ articleId: parent.id}).limit(args.limit);
+              }else {
+                return Opinion.find({ articleId: parent.id ,_id: {$gt: args.lastId} }).limit(args.limit);
+              }
             }
         },
         likedby: { type: new GraphQLList(GraphQLID) },
@@ -186,12 +194,15 @@ const FeedType = new GraphQLObjectType({
             pageName: { type: GraphQLString },
             limit: { type: new GraphQLNonNull(GraphQLInt) },
             lastId: { type: new GraphQLNonNull(GraphQLString) },
+            order: { type: new GraphQLNonNull(GraphQLInt) }
            },
           resolve(parent, args){
-            if (args.lastId=="") {
+            if (args.lastId=="" && args.order==1) {
               return Article.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
-            }else {
+            }else if (args.order==1) {
               return Article.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
+            }else if (args.order==-1) {
+              return Article.find({pageName: args.pageName ,_id: {$lt: args.lastId}}).sort({_id:-1}).limit(args.limit);
             }
           }
         },
@@ -201,13 +212,16 @@ const FeedType = new GraphQLObjectType({
             pageName: { type: GraphQLString },
             limit: { type: new GraphQLNonNull(GraphQLInt) },
             lastId: { type: new GraphQLNonNull(GraphQLString) },
+            order: { type: new GraphQLNonNull(GraphQLInt) }
            },
           resolve(parent, args){
-            if (args.lastId=="") {
+            if (args.lastId=="" && args.order==1) {
               return Question.find({pageName: args.pageName}).sort({_id:-1}).limit(args.limit);
-            }else {
+            }else if (args.order==1){
               return Question.find({pageName: args.pageName ,_id: {$gt: args.lastId}}).sort({_id:-1}).limit(args.limit);
-            }          }
+            }else if (args.order==-1){
+              return Question.find({pageName: args.pageName ,_id: {$lt: args.lastId}}).sort({_id:-1}).limit(args.limit);
+            }           }
         }
     })
 });
@@ -291,9 +305,10 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(AnswerType),
             args: { id: { type: GraphQLID },
             limit: { type: new GraphQLNonNull(GraphQLInt) },
-            lastId: { type: new GraphQLNonNull(GraphQLString) } },
+            skip: { type: new GraphQLNonNull(GraphQLInt) }
+          },
             resolve(parent, args){
-                return Answer.find({questionId: args.id});
+                return Answer.find({questionId: args.id}).skip(args.skip).limit(args.limit);
             }
         },
         feed: {
