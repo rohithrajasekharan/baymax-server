@@ -53,12 +53,8 @@ const ArticleType = new GraphQLObjectType({
         },
         opinions: {
             type: new GraphQLList(OpinionType),
-            resolve(parent, args){
-              if (args.lastId=="") {
+            resolve(parent){
                 return Opinion.find({ articleId: parent.id}).limit(5);
-              }else {
-                return Opinion.find({ articleId: parent.id ,_id: {$gt: args.lastId} }).limit(5);
-              }
             }
         },
         likedby: { type: new GraphQLList(GraphQLID) },
@@ -315,30 +311,21 @@ const RootQuery = new GraphQLObjectType({
         },
         loadchat: {
             type: new GraphQLList(MessageType),
-            args: { pageName: { type: new GraphQLNonNull(GraphQLString) } },
+            args: { pageName: { type: new GraphQLNonNull(GraphQLString) },
+            id: { type: new GraphQLNonNull(GraphQLID) }
+           },
             resolve(parent, args){
-              if (args.pageName==="Diabetes") {
+              if (args.pageName==="Diabetes" && args.id=="") {
                   return DiabetesMessage.find().limit(50).sort({_id:-1});
-              }else {
+              }else if (args.pageName==="Baby and Me" && args.id==""){
                   return BabyandmeMessage.find().limit(50).sort({_id:-1});
+              }else if (args.pageName==="Diabetes" && args.id!=="") {
+                  return DiabetesMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
+              }else {
+                  return BabyandmeMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
               }
 
             }
-        },
-        oldermessages: {
-          type: new GraphQLList(MessageType),
-          args: {
-            pageName: { type: new GraphQLNonNull(GraphQLString) },
-            id: { type: new GraphQLNonNull(GraphQLID) }
-           },
-          resolve(parent, args){
-            if (args.pageName==="Diabetes") {
-                return DiabetesMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
-            }else {
-                return BabyandmeMessage.find({_id: {$lt: args.id}}).limit(50).sort({_id:-1});
-            }
-
-          }
         },
         newMessages: {
             type: GraphQLInt,
