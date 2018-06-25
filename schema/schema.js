@@ -53,15 +53,11 @@ const ArticleType = new GraphQLObjectType({
         },
         opinions: {
             type: new GraphQLList(OpinionType),
-            args: {
-              limit: { type: new GraphQLNonNull(GraphQLInt) },
-              lastId: { type: new GraphQLNonNull(GraphQLString) },
-             },
             resolve(parent, args){
               if (args.lastId=="") {
-                return Opinion.find({ articleId: parent.id}).limit(args.limit);
+                return Opinion.find({ articleId: parent.id}).limit(5);
               }else {
-                return Opinion.find({ articleId: parent.id ,_id: {$gt: args.lastId} }).limit(args.limit);
+                return Opinion.find({ articleId: parent.id ,_id: {$gt: args.lastId} }).limit(5);
               }
             }
         },
