@@ -37,7 +37,10 @@ const ArticleType = new GraphQLObjectType({
         imageId: {type: GraphQLString},
         likes: {type: GraphQLInt},
         comments: {type: GraphQLInt},
-        createdAt: {type: GraphQLDate},
+        createdAt: {type: GraphQLString,
+        resolve(parent, args){
+            return moment(new Date(parent.createdAt)).format();
+        }},
         author: {
             type: UserType,
             resolve(parent, args){
@@ -69,9 +72,10 @@ const OpinionType = new GraphQLObjectType({
         articleId: { type: GraphQLString },
         userId: { type: GraphQLString },
         createdAt: {
-          type: GraphQLDate,
+          type: GraphQLString,
           resolve(parent, args){
-            return (moment(parent.createdAt).format());
+
+            return ((dd <= 9 ? '0' + dd : dd)+"-"+(mm <= 9 ? '0' + mm : mm)+"-"+yyyy+" at "+hr+":"+min);
         }
       },
         article: {
