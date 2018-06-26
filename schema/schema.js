@@ -1,5 +1,6 @@
 const graphql = require('graphql');
-const GraphQLDate = require('graphql-date')
+const GraphQLDate = require('graphql-date');
+const moment = require('moment');
 const Article = require('../models/article-model');
 const Opinion = require('../models/comment-model');
 const Answer = require('../models/answer-model');
@@ -68,15 +69,9 @@ const OpinionType = new GraphQLObjectType({
         articleId: { type: GraphQLString },
         userId: { type: GraphQLString },
         createdAt: {
-          type: GraphQLString,
+          type: GraphQLDate,
           resolve(parent, args){
-            var today = new Date(parent.createdAt);
-            var dd = today.getDate();
-            var mm = today.getMonth()+1;
-            var yyyy = today.getFullYear();
-            var hr = today.getHours();
-            var min = today.getMinutes();
-            return ((dd <= 9 ? '0' + dd : dd)+"-"+(mm <= 9 ? '0' + mm : mm)+"-"+yyyy+" at "+hr+":"+min);
+            return (moment(parent.createdAt).format());
         }
       },
         article: {
