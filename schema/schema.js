@@ -121,16 +121,10 @@ const QuestionType = new GraphQLObjectType({
         question: { type: GraphQLString },
         description: { type: GraphQLString },
         pageName: { type: GraphQLString },
-        createdAt: {
-          type: GraphQLString,
-          resolve(parent, args){
-            var today = new Date(parent.createdAt);
-            var dd = today.getDate();
-            var mm = today.getMonth()+1;
-            var yyyy = today.getFullYear();
-            return (dd+" "+mm+" "+yyyy);
-        }
-      },
+        createdAt: {type: GraphQLString,
+        resolve(parent, args){
+            return moment(parent.createdAt, moment.ISO_8601);
+        }},
         author: {
           type: UserType,
           resolve(parent, args){
