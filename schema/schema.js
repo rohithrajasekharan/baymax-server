@@ -1,4 +1,5 @@
 const graphql = require('graphql');
+const GraphQLDate = require('graphql-date')
 const Article = require('../models/article-model');
 const Opinion = require('../models/comment-model');
 const Answer = require('../models/answer-model');
@@ -35,16 +36,7 @@ const ArticleType = new GraphQLObjectType({
         imageId: {type: GraphQLString},
         likes: {type: GraphQLInt},
         comments: {type: GraphQLInt},
-        createdAt: {
-          type: GraphQLString,
-          resolve(parent, args){
-            var today = new Date(parent.createdAt);
-            var dd = today.getDate();
-            var mm = today.getMonth()+1;
-            var yyyy = today.getFullYear();
-            return (dd+"-"+mm+"-"+yyyy);
-        }
-      },
+        createdAt: {type: GraphQLDate},
         author: {
             type: UserType,
             resolve(parent, args){
@@ -75,6 +67,18 @@ const OpinionType = new GraphQLObjectType({
         message: { type: GraphQLString },
         articleId: { type: GraphQLString },
         userId: { type: GraphQLString },
+        createdAt: {
+          type: GraphQLString,
+          resolve(parent, args){
+            var today = new Date(parent.createdAt);
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+            var hr = today.getHours();
+            var min = today.getMinutes();
+            return ((dd <= 9 ? '0' + dd : dd)+"-"+(mm <= 9 ? '0' + mm : mm)+"-"+yyyy+" at "+hr+":"+min);
+        }
+      },
         article: {
             type: ArticleType,
             resolve(parent, args){
@@ -366,7 +370,9 @@ const Mutation = new GraphQLObjectType({
                     userId: args.userId,
                     videoId: args.videoId,
                     imageId: args.imageId,
-                    createdAt: Date.now()
+                    createdAt: Date.now(),
+                    likes:0,
+                    comments:0
                 });
                 return article.save();
             }
@@ -423,7 +429,8 @@ const Mutation = new GraphQLObjectType({
                     answer: args.answer,
                     questionId: args.questionId,
                     userId: args.userId,
-                    createdAt: Date.now()
+                    createdAt: Date.now(),
+                    votes: 0
                 });
                 return answer.save();
             }
