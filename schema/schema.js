@@ -39,7 +39,7 @@ const ArticleType = new GraphQLObjectType({
         comments: {type: GraphQLInt},
         createdAt: {type: GraphQLString,
         resolve(parent, args){
-            return moment(new Date(parent.createdAt)).format();
+            return moment(parent.createdAt, moment.ISO_8601);
         }},
         author: {
             type: UserType,
