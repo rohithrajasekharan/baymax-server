@@ -73,9 +73,14 @@ const OpinionType = new GraphQLObjectType({
         userId: { type: GraphQLString },
         createdAt: {
           type: GraphQLString,
-          resolve(parent, args){
-
-            return ((dd <= 9 ? '0' + dd : dd)+"-"+(mm <= 9 ? '0' + mm : mm)+"-"+yyyy+" at "+hr+":"+min);
+            resolve(parent, args){
+              var today = new Date(parent.createdAt);
+              var dd = today.getDate();
+              var mm = today.getMonth()+1;
+              var yyyy = today.getFullYear();
+              var hr = today.getHours();
+              var min = today.getMinutes();
+              return((dd <= 9 ? '0' + dd : dd)+"-"+(mm <= 9 ? '0' + mm : mm)+"-"+yyyy+" at "+(hr >= 12 ? hr-12+":"+(min<=9?"0"+min:min)+" pm ":hr+":"+(min<=9?"0"+min:min)+" am "));
         }
       },
         article: {
