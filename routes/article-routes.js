@@ -20,12 +20,12 @@ router.post('/new', (req, res) => {
   })
 });
 router.get('/feed/:pageName', (req, res) => {
-Article.find({pageName:req.params.pageName}).limit(10).then((err,articles)=>{
+Article.find({'pageName': req.params.pageName}).sort({_id:-1}).limit(10).then((articles)=>{
   res.json(articles);
 });
 });
 router.get('/answers/:id', (req, res) => {
-Answer.find({articleId:req.params.id}, (err, article) => {
+Answer.find({'articleId':req.params.id}, (err, article) => {
         res.json(article);
     });
   });
