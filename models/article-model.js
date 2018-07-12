@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const User = require('./user-model');
 const Schema = mongoose.Schema;
 const ArticleSchema = mongoose.Schema({
 	title: String,
 	content: String,
-	userId: String,
+	userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
 	pageName: String,
 	type: String,
 	videoId: String,

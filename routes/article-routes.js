@@ -93,20 +93,20 @@ router.get('/bookmarks/:id',(req,res)=>{
 })
 
 router.get('/feed/:pageName', (req, res) => {
-Article.find({'pageName': req.params.pageName}).sort({_id:-1}).limit(10).then((articles)=>{
+Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likes:1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then((articles)=>{
   res.json(articles);
 });
 });
 router.get('/answers/:id', (req, res) => {
-Answer.find({'articleId':req.params.id}, (err, article) => {
-        res.json(article);
-    });
+Answer.find({'articleId':req.params.id}).populate({path: 'userId',select: '_id name avatar'}).then((answers)=>{
+  res.json(answers);
+});
   });
 
 router.get('/:id', (req,res) => {
-  Article.findById(req.params.id, (err, article)=>{
+  Article.findById(req.params.id).populate('userId').then((article)=>{
     res.json(article);
-  })
+  });
 });
 
 module.exports = router;
