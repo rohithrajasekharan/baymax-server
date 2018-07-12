@@ -12,7 +12,7 @@ router.post('/new', (req, res) => {
   let newArticle = new Article({
     name: name,
     title: title,
-    content: content
+    content: content 
   });
 Article.createArticle(newArticle, (err, article) => {
                 res.json(article);
