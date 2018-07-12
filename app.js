@@ -30,7 +30,8 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme', () => {
+
+mongoose.connect(process.env.dburl, () => {
     console.log("connected to db");
 });
 
