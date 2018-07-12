@@ -20,7 +20,7 @@ router.post('/new', (req, res) => {
   })
 });
 router.get('/feed/:pageName', (req, res) => {
-Answer.find({pageName:req.params.pageName}).limit(10).then((err,articles)=>{
+Article.find({pageName:req.params.pageName}).limit(10).then((err,articles)=>{
   res.json(articles);
 });
 });
