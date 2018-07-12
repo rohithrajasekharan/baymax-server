@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
 const Article = require('../models/article-model');
-const Comments = require('../models/article-model');
+const Answer = require('../models/answer-model');
 
 router.post('/new', (req, res) => {
   let newArticle = new Article({
