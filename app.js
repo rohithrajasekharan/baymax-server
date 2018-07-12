@@ -31,7 +31,7 @@ app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
 
-mongoose.connect(process.env.dburl, () => {
+mongoose.connect(process.env.dbUrl, () => {
     console.log("connected to db");
 });
 
