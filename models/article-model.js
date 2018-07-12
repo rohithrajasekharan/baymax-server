@@ -5,6 +5,7 @@ const ArticleSchema = mongoose.Schema({
 	content: String,
 	userId: String,
 	pageName: String,
+	type: String,
 	videoId: String,
 	imageId: String,
 	likes: Number,

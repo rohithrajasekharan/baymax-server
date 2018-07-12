@@ -2,38 +2,35 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const Article = require('../models/article-model');
 const Comments = require('../models/article-model');
+
 router.post('/new', (req, res) => {
-  let name = req.body.name;
-  let title = req.body.title;
-  let content = req.body.content;
-  let opinion = req.body.opinion;
-  let user = req.body.user;
-  let message = req.body.message;
   let newArticle = new Article({
-    name: name,
-    title: title,
-    content: content 
+     title : req.body.title,
+     content : req.body.content,
+     userId : req.body.userId,
+     type : req.body.type,
+     videoId : req.body.videoId,
+     imageId : req.body.imageId,
+     likes: 0,
+     comments: 0,
+     createdAt: Date.now()
   });
-Article.createArticle(newArticle, (err, article) => {
-                res.json(article);
-  });
+  newArticle.save().then((article)=>{
+    res.json(article);
+  })
 });
-router.post('/addcomment', (req, res) => {
-  let commentAuthor = req.body.commentAuthor;
-  let text = req.body.text;
-  let articleId = req.body.articleId;
-  let newComment = new Comments({
-    commentAuthor: commentAuthor ,
-    text: text,
-    articleId: articleId
-  });
-Article.addComment(newComment, (err, article) => {
-                  res.json(article);
+router.get('/feed', (req, res) => {
+Answer.find({"userId":req.params.id}).limit(10).then((err,articles)=>{
+  res.json(articles)l
+});
+router.get('/answers', (req, res) => {
+Answer.find({"articleId":req.params.id}, (err, article) => {
+        res.json(article);
     });
   });
 
 router.get('/:id', (req,res) => {
-  Article.getArticleById(req.params.id, (err, article)=>{
+  Article.findById(req.params.id, (err, article)=>{
     res.json(article);
   })
 });
