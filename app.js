@@ -27,7 +27,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.static('public'));
-
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
