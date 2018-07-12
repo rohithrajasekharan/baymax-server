@@ -13,7 +13,7 @@ router.post('/new', (req, res) => {
     type: req.body.type,
     createdAt: Date.now(),
     likes: 0,
-    comments: 0
+    comments: 0 
   });
 Article.createArticle(newArticle, (err, article) => {
     res.json(article);
