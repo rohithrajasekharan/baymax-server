@@ -14,25 +14,24 @@ const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
-
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
-    keys: [process.env.keys]
+    keys: ['eagggggawgedsge']
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.static('public'));
-
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 
-mongoose.connect("mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme", () => {
+
+mongoose.connect(process.env.dburl, () => {
     console.log("connected to db");
 });
 
