@@ -1,39 +1,46 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
 const Article = require('../models/article-model');
-const Comments = require('../models/article-model');
+const Answer = require('../models/answer-model');
+
 router.post('/new', (req, res) => {
-  let name = req.body.name;
-  let title = req.body.title;
-  let content = req.body.content;
-  let opinion = req.body.opinion;
-  let user = req.body.user;
-  let message = req.body.message;
   let newArticle = new Article({
-    name: name,
-    title: title,
-    content: content
+    title: req.body.title,
+    content: req.body.content,
+    pageName: req.body.pageName,
+    videoId: req.body.videoId,
+    imageId: req.body.imageId,
+    type: req.body.type,
+    createdAt: Date.now(),
+    likes: 0,
+    comments: 0
   });
 Article.createArticle(newArticle, (err, article) => {
-                res.json(article);
+    res.json(article);
   });
 });
-router.post('/addcomment', (req, res) => {
-  let commentAuthor = req.body.commentAuthor;
-  let text = req.body.text;
-  let articleId = req.body.articleId;
-  let newComment = new Comments({
-    commentAuthor: commentAuthor ,
-    text: text,
-    articleId: articleId
+router.post('/addanswer', (req, res) => {
+  let newAnswer = new Answer({
+    answer: req.body.answer,
+    userId: req.body.userId,
+    articleId: req.body.articleId,
+    type: req.body.type,
+    createdAt: Date.now(),
+    votes: 0,
   });
-Article.addComment(newComment, (err, article) => {
-                  res.json(article);
-    });
-  });
+answer.save().then(answer=>{
+  res.json(answer)
+})
+});
+
+router.get('/answers', (req,res) => {
+  Answer.find("articleId":req.params.id, (err, answers)=>{
+    res.json(article);
+  })
+});
 
 router.get('/:id', (req,res) => {
-  Article.getArticleById(req.params.id, (err, article)=>{
+  Article.findById(req.params.id, (err, article)=>{
     res.json(article);
   })
 });

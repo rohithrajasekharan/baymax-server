@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Article = require('../models/article-model');
-const Question = require('../models/question-model');
-const Product = require('../models/product');
 const Schema = mongoose.Schema;
 const UserSchema = mongoose.Schema({
 	name: String,
@@ -18,8 +16,7 @@ const UserSchema = mongoose.Schema({
 	avatar: String,
   logintype: String,
 	lasttimestamp: Date,
-	articlebookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}],
-	questionbookmark: [{type: Schema.Types.ObjectId, ref: 'Question'}]
+	articlebookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}]
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);

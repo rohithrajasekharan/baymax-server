@@ -4,7 +4,8 @@ const AnswerSchema = mongoose.Schema({
 	answer: String,
   votes: Number,
   userId: String,
-  questionId: String,
+  articleId: String,
+	type: String,
 	createdAt: Date
 });
 
