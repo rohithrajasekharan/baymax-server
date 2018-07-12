@@ -19,12 +19,12 @@ router.post('/new', (req, res) => {
     res.json(article);
   })
 });
-router.get('/feed', (req, res) => {
+router.get('/feed/:pageName', (req, res) => {
 Answer.find({pageName:req.params.pageName}).limit(10).then((err,articles)=>{
   res.json(articles);
 });
 });
-router.get('/answers', (req, res) => {
+router.get('/answers/:id', (req, res) => {
 Answer.find({articleId:req.params.id}, (err, article) => {
         res.json(article);
     });
