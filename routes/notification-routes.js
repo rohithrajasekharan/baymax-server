@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const Notif = require('../models/notification-model');
 
-router.get("/notification",(req,res)=>{
+router.get("/",(req,res)=>{
     var uid=req.query.uid;
     var dpos=req.query.dpos;//dismissPosition
 
