@@ -92,13 +92,14 @@ router.get('/bookmarks/:id',(req,res)=>{
   })
 })
 
-router.get('/feed/:pageName', (req, res) => {
+router.get('/feed/:pageName/:id', (req, res) => {
 Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,likedby:1,type:1,videoId:1,imageId:1,likes:1,comments:1,createdAt:1},(err,article)=>{
   var array = [];
   article.map((data)=>{
-    if(data.likedby.indexOf("5b3298b918b17419d73fa3fb")>-1){
+    if(data.likedby.indexOf(req.params.id)>-1){
   var pair = {isliked: true};
   data = {...data._doc, ...pair};
+  delete data.likedby;
       array.push(data);
     }else{
   var pair = {isliked: false};
