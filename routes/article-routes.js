@@ -104,19 +104,28 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,likedby:1,
     }else{
   var pair = {isliked: false};
   data = {...data._doc, ...pair};
+  delete data.likedby;
       array.push(data);
     }
   });
     res.json(array);
-
-
 }).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'})
 });
-router.get('/answers/:id', (req, res) => {
-Answer.find({'articleId':req.params.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).then((answers)=>{
+
+router.post('/answers', (req, res) => {
+  if(parseInt(req.body.limit)==null){
+    console.log("sdcas");
+    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
+      res.json(answers);
+    });
+  }else{
+    console.log('asfcazxv');
+Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).then((answers)=>{
   res.json(answers);
 });
+  }
   });
+
 
 router.get('/:id', (req,res) => {
   Article.findById(req.params.id).populate({path:'userId',select: '_id name avatar'}).then((article)=>{
