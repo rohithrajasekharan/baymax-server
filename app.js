@@ -33,7 +33,7 @@ app.use('/article', articleRoutes);
 app.use('/notification', notifRoutes);
 
 
-mongoose.connect(process.env.dbUrl, () => {
+mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme', () => {
     console.log("connected to db");
 });
 

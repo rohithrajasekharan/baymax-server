@@ -92,13 +92,28 @@ router.get('/bookmarks/:id',(req,res)=>{
   })
 })
 
-router.get('/feed/:pageName', (req, res) => {
-Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likes:1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then((articles)=>{
-  res.json(articles);
-});
+router.get('/feed/:pageName/:id', (req, res) => {
+Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,likedby:1,type:1,videoId:1,imageId:1,likes:1,comments:1,createdAt:1},(err,article)=>{
+  var array = [];
+  article.map((data)=>{
+    if(data.likedby.indexOf(req.params.id)>-1){
+  var pair = {isliked: true};
+  data = {...data._doc, ...pair};
+  delete data.likedby;
+      array.push(data);
+    }else{
+  var pair = {isliked: false};
+  data = {...data._doc, ...pair};
+      array.push(data);
+    }
+  });
+    res.json(array);
+
+
+}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'})
 });
 router.get('/answers/:id', (req, res) => {
-Answer.find({'articleId':req.params.id}).populate({path: 'userId',select: '_id name avatar'}).then((answers)=>{
+Answer.find({'articleId':req.params.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).then((answers)=>{
   res.json(answers);
 });
   });
