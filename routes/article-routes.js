@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user-model');
 const Article = require('../models/article-model');
 const Answer = require('../models/answer-model');
+const ObjectId = mongoose.Types.ObjectId;
 
 router.post('/new', (req, res) => {
   let newArticle = new Article({
@@ -93,27 +94,13 @@ router.get('/bookmarks/:id',(req,res)=>{
 })
 
 router.get('/feed/:pageName/:id', (req, res) => {
-Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,likedby:1,type:1,videoId:1,imageId:1,likes:1,comments:1,createdAt:1},(err,article)=>{
-  var array = [];
-  article.map((data)=>{
-    if(data.likedby.indexOf(req.params.id)>-1){
-  var pair = {isliked: true};
-  data = {...data._doc, ...pair};
-  delete data.likedby;
-      array.push(data);
-    }else{
-  var pair = {isliked: false};
-  data = {...data._doc, ...pair};
-  delete data.likedby;
-      array.push(data);
-    }
-  });
-    res.json(array);
-}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'})
+Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.params.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  res.json(data);
+})
 });
 
 router.post('/answers', (req, res) => {
-  if(parseInt(req.body.limit)==null){ 
+  if(parseInt(req.body.limit)==null){
     Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
       res.json(answers);
     });
