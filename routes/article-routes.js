@@ -32,6 +32,7 @@ router.post('/answer', (req, res) => {
      createdAt: Date.now()
   });
   newComment.save().then((answer)=>{
+    Article.findOneAndUpdate({_id:req.body.articleId},{$inc:{'comments':1}});
     res.json(answer);
   })
 });
