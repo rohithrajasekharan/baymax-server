@@ -31,8 +31,8 @@ router.post('/answer', (req, res) => {
      votes: 0,
      createdAt: Date.now()
   });
+  Article.findOneAndUpdate({_id:req.body.articleId},{$inc:{'comments':1}});//Change this to something more efficient
   newComment.save().then((answer)=>{
-    Article.findOneAndUpdate({_id:req.body.articleId},{$inc:{'comments':1}});
     res.json(answer);
   })
 });
@@ -116,7 +116,7 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,vid
 
 router.post('/answers', (req, res) => {
   if(parseInt(req.body.limit)==null){
-    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
+    Answer.find({'articleId':req.body.id},{$orderby:{'_id':-1}}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
       res.json(answers);
     });
   }else{
