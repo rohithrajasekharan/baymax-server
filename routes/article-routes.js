@@ -116,9 +116,9 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,vid
 
 router.post('/answers', (req, res) => {
   if(parseInt(req.body.limit)==null){
-    Answer.find({'articleId':req.body.id},{$orderby:{'_id':-1}}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
+    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
       res.json(answers);
-    });
+    }).sort({'_id':-1});
   }else{
 Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).then((answers)=>{
   res.json(answers);
