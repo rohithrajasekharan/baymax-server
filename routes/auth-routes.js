@@ -47,13 +47,17 @@ router.post('/message', (req, res) => {
     mail: mail,
     content: content
   });
-query.save();
+query.save().then(()=>{
+res.send('saved');
+});
 });
 router.post('/getstarted', (req, res) => {
   let query = new Email({
     email: req.body.email
   });
-query.save();
+query.save().then(()=>{
+res.send('saved');
+});
 });
 
 module.exports = router;
