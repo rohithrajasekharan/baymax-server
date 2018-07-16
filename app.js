@@ -16,10 +16,17 @@ const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
-app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({
+  'allowedHeaders': ['sessionId', 'Content-Type'],
+  'exposedHeaders': ['sessionId'],
+  'origin': '*',
+  'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  'preflightContinue': false
+}));
+
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: ['eagggggawgedsge']
