@@ -5,6 +5,7 @@ const passport = require('passport');
 const authRoutes = require('./routes/auth-routes');
 const articleRoutes = require('./routes/article-routes');
 const notifRoutes = require('./routes/notification-routes');
+const indexRoutes = require('./routes/index-routes');
 const localAuth = require('./config/local-auth');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');

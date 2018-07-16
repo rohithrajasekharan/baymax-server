@@ -24,15 +24,15 @@ router.post('/new', (req, res) => {
 
 router.post('/answer', (req, res) => {
   let newComment = new Answer({
-     answer : req.body.title,
+     answer : req.body.answer,
      articleId : req.body.articleId,
      userId : req.body.userId,
      type : req.body.type,
      votes: 0,
      createdAt: Date.now()
   });
-  newComment.save().then((answer)=>{
-    res.json(answer);
+  Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1}}).then(()=>{
+    res.json(newComment.save().populate('userId'));
   })
 });
 
