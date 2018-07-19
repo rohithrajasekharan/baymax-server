@@ -31,14 +31,8 @@ router.post('/answer', (req, res) => {
      votes: 0,
      createdAt: Date.now()
   });
-<<<<<<< HEAD
   Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1}}).then(()=>{
     res.json(newComment.save().populate('userId'));
-=======
-  Article.findOneAndUpdate({_id:req.body.articleId},{$inc:{'comments':1}});//Change this to something more efficient
-  newComment.save().then((answer)=>{
-    res.json(answer);
->>>>>>> 836bc6e1c1c99ae261f078107f7dfeae7d365698
   })
 });
 
@@ -120,15 +114,23 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,vid
 });
 
 router.post('/answers', (req, res) => {
-  if(parseInt(req.body.limit)==null){
-    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
+  if(parseInt(req.body.limit)==null && req.body.type=='answer'){
+    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'votes': -1}).then((answers)=>{
       res.json(answers);
-    }).sort({'_id':-1});
-  }else{
-Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).then((answers)=>{
+    });
+  }else if(parseInt(req.body.limit)!==null && req.body.type=='answer'){
+Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'votes': -1}).then((answers)=>{
   res.json(answers);
 });
-  }
+}else if(parseInt(req.body.limit)==null && req.body.type=='comment'){
+  Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'_id': -1}).then((answers)=>{
+    res.json(answers);
+  });
+}else if(parseInt(req.body.limit)!==null && req.body.type=='comment'){
+  Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'_id': -1}).then((answers)=>{
+    res.json(answers);
+  });
+}
   });
 
 
