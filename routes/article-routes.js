@@ -87,7 +87,7 @@ router.get('/removeanswer/:id', (req, res) => {
 });
 
 router.get('/bookmarks/:id',(req,res)=>{
-  User.find({_id :req.params.id},{bookmark:1}).populate({path: 'bookmark',select: '_id title content pageName imageId createdAt comments'}).then((user)=>{
+  User.find({_id :req.params.id},{bookmark:1}).populate({path: 'bookmark',select: '_id title content pageName imageId type createdAt comments'}).then((user)=>{
     res.json(user);
   })
 })
