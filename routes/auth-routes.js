@@ -29,7 +29,8 @@ router.get('/user', (req,res) => {
 router.post('/login',
   passport.authenticate('local'),
   function(req, res) {
-    res.json(req.user);
+    console.log("request");
+    res.send("req.user");
     });
 
 router.get('/logout',(req,res) => {

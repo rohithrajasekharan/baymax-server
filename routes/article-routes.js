@@ -66,7 +66,6 @@ router.post('/vote', (req, res) => {
   res.send('Downvoted');
   })
   }
-
 });
 
 router.get('/removearticle/:id', (req, res) => {
