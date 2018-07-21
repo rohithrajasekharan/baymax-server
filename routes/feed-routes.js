@@ -19,7 +19,7 @@ Article.find({pageName: req.body.pageName,_id: {$gt: req.body.lastId}},{title: 1
 
 router.post('/refresh/priority', (req, res) => {
   Article.findById(req.body.lastId,(err, article)=>{
-    Article.find({pageName: req.body.pageName,weight: {$gt: article.weight}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({weight:1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+    Article.find({pageName: req.body.pageName,weight: {$gt: article.weight}},{title: 1, content: 1 ,type:1,weight:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({weight:-1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
       res.json(data);
     })
   })
