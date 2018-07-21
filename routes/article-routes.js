@@ -10,6 +10,7 @@ router.post('/new', (req, res) => {
      title : req.body.title,
      content : req.body.content,
      userId : req.body.userId,
+     pageName: req.body.pageName,
      type : req.body.type,
      videoId : req.body.videoId,
      imageId : req.body.imageId,
@@ -31,19 +32,26 @@ router.post('/answer', (req, res) => {
      votes: 0,
      createdAt: Date.now()
   });
-  Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1}}).then(()=>{
-    res.json(newComment.save().populate('userId'));
-  })
+  if (article.type=='question') {
+    Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 4}}).then(()=>{
+      res.json(newComment.save().populate('userId'));
+    })
+  }else{
+    Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 1}}).then(()=>{
+      res.json(newComment.save().populate('userId'));
+    })
+  }
+
 });
 
 router.post('/like', (req, res) => {
   if (req.body.type=='like') {
-  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : 1}, $push: { 'likedby': req.body.userId } }).then((data)=>{
+  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : 1,'weight' : 1}, $push: { 'likedby': req.body.userId } }).then((data)=>{
   res.send('Success');
   })
   }
   else if (req.body.type=='dislike') {
-  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : -1}, $pull: { 'likedby': req.body.userId } }).then((data)=>{
+  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : -1,'weight' : -1}, $pull: { 'likedby': req.body.userId } }).then((data)=>{
   res.send('Success');
   })
   }
