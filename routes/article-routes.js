@@ -15,6 +15,7 @@ router.post('/new', (req, res) => {
      videoId : req.body.videoId,
      imageId : req.body.imageId,
      likes: 0,
+     weight: 5,
      comments: 0,
      createdAt: Date.now()
   });

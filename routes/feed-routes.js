@@ -6,7 +6,7 @@ const Answer = require('../models/answer-model');
 const ObjectId = mongoose.Types.ObjectId;
 
 router.post('/load', (req, res) => {
-Article.find({pageName: req.body.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).skip(10).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+Article.find({pageName: req.body.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).skip(req.body.skip).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
   res.json(data);
 })
 });
