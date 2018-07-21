@@ -87,7 +87,7 @@ router.get('/removeanswer/:id', (req, res) => {
 });
 
 router.get('/bookmarks/:id',(req,res)=>{
-  User.find({_id :req.params.id},{bookmark:1,_id:0}).populate({path: 'bookmark',select: '_id title content pageName imageId type createdAt comments'}).then((user)=>{
+  User.find({_id :req.params.id},{bookmark:1,_id:0}).populate({path: 'bookmark',select: '_id title userId content pageName imageId type createdAt comments',populate: {path: "userId",select:'_id name avatar isDoc'}}).populate('bookmark.userId').then((user)=>{
     res.json(user);
   })
 })
@@ -113,19 +113,19 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,vid
 });
 
 router.post('/answers', (req, res) => {
-  if(parseInt(req.body.limit)==null && req.body.type=='answer'){
+  if(parseInt(req.body.limit)==null && req.body.type=='question'){
     Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'votes': -1}).then((answers)=>{
       res.json(answers);
     });
-  }else if(parseInt(req.body.limit)!==null && req.body.type=='answer'){
+  }else if(parseInt(req.body.limit)!==null && req.body.type=='question'){
 Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'votes': -1}).then((answers)=>{
   res.json(answers);
 });
-}else if(parseInt(req.body.limit)==null && req.body.type=='comment'){
+}else if(parseInt(req.body.limit)==null && req.body.type!=='question'){
   Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'_id': -1}).then((answers)=>{
     res.json(answers);
   });
-}else if(parseInt(req.body.limit)!==null && req.body.type=='comment'){
+}else if(parseInt(req.body.limit)!==null && req.body.type!=='question'){
   Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'_id': -1}).then((answers)=>{
     res.json(answers);
   });
