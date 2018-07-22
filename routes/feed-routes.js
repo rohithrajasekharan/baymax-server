@@ -26,9 +26,7 @@ router.post('/refresh/priority', (req, res) => {
 });
 
 router.post('/random', (req, res) => {
- var N = Article.count({pageName: req.body.pageName})
- var R = Math.floor(Math.random() * N)
-Article.find({pageName: req.body.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).limit(20).skip(R).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+Article.find({pageName: req.body.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
   res.json(data);
 })
 });
