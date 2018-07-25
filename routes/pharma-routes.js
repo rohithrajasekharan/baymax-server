@@ -3,6 +3,12 @@ const router = express.Router();
 const Product = require('../models/product');
 const PharmaHome = require('../models/pharmahome');
 
+router.get('/search',(req,res)=>{
+  Product.find({category:req.query.category, $text: {$search: req.query.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
+    res.json(response);
+  })
+})
+
 router.get('/home/:category',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
       res.json(products)

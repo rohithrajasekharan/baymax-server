@@ -5,6 +5,7 @@ const passport = require('passport');
 const authRoutes = require('./routes/auth-routes');
 const articleRoutes = require('./routes/article-routes');
 const feedRoutes = require('./routes/feed-routes');
+const pharmaRoutes = require('./routes/pharma-routes');
 const notifRoutes = require('./routes/notification-routes');
 const indexRoutes = require('./routes/index-routes');
 const localAuth = require('./config/local-auth');
@@ -38,6 +39,7 @@ app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
 app.use('/notification', notifRoutes);
 app.use('/feed', feedRoutes);
+app.use('/pharma', pharmaRoutes);
 
 
 mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme', () => {
