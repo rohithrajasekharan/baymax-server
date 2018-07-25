@@ -4,9 +4,16 @@ const Product = require('../models/product');
 const PharmaHome = require('../models/pharmahome');
 
 router.get('/search',(req,res)=>{
-  Product.find({category:req.query.category, $text: {$search: req.query.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
-    res.json(response);
-  })
+  if (req.query.category=="") {
+    Product.find({$text: {$search: req.query.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
+      res.json(response);
+    })
+  }else{
+    Product.find({category:req.query.category, $text: {$search: req.query.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
+      res.json(response);
+    })
+  }
+
 })
 
 router.get('/home/:category',(req, res)=> {
