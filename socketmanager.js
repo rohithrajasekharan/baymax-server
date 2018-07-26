@@ -5,6 +5,7 @@ module.exports = (ws)=> {
   const BabyandmeMessage = require('./models/message-model').BabyandmeMessage;
   const User = require('./models/user-model');
   const wss = require('./app.js').wss;
+  console.log('connection is made');
   ws.on('chat Diacare', (data)=> {
     let newMessage = new DiabetesMessage({
       message: data.message,
