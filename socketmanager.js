@@ -1,6 +1,6 @@
 module.exports = (socket)=> {
-  const DiabetesMessage = require('../models/message-model').DiabetesMessage;
-  const BabyandmeMessage = require('../models/message-model').BabyandmeMessage;
+  const DiabetesMessage = require('./models/message-model').DiabetesMessage;
+  const BabyandmeMessage = require('./models/message-model').BabyandmeMessage;
   const User = require('./models/user-model');
   const io = require('./app.js').io;
   console.log("made socket connection", socket.id);
