@@ -1,18 +1,38 @@
 module.exports = (socket)=> {
-  const Messages = require('./models/message-model');
+  const DiabetesMessage = require('../models/message-model').DiabetesMessage;
+  const BabyandmeMessage = require('../models/message-model').BabyandmeMessage;
   const User = require('./models/user-model');
   const io = require('./app.js').io;
   console.log("made socket connection", socket.id);
-  socket.on('chat message', (data)=> {
-    let newMessage = new Messages({
-      conversationId: data.conversationId,
+  socket.on('chat Diacare', (data)=> {
+    let newMessage = new DiabetesMessage({
       message: data.message,
-      sendersId: data.sendersId,
+      userId: data.userId,
+      type: data.type,
+      replyto: data.replyto,
       createdAt: new Date()
     });
     newMessage.save().then((resp)=>{
-      Messages.find({_id:resp.id}).populate('sendersId').then((message) => {
-        io.sockets.emit('chat message',message)
+      DiabetesMessage.find({_id:resp.id}).populate({path: 'userId',select: '_id name isDoc'}).then((message) => {
+        io.sockets.emit('chat Diacare',message)
+      })
+
+
+
+    })
+
+  })
+  socket.on('chat Babyandme', (data)=> {
+    let newMessage = new BabyandmeMessage({
+      message: data.message,
+      userId: data.userId,
+      type: data.type,
+      replyto: data.replyto,
+      createdAt: new Date()
+    });
+    newMessage.save().then((resp)=>{
+      BabyandmeMessage.find({_id:resp.id}).populate({path: 'userId',select: '_id name isDoc'}).then((message) => {
+        io.sockets.emit('chat Babyandme',message)
       })
 
 
@@ -33,12 +53,4 @@ module.exports = (socket)=> {
     socket.username=username;
     });
 
-
-    socket.on('iamback',function(){
-      User.find({name:socket.username}).then((resp) => {
-          Messages.find({createdAt: {$gt: new Date(resp[0].lasttimestamp)}}).populate('sendersId').sort({_id:1}).then((data) => {
-            socket.emit('unreadmessages', data)
-          })
-      })
-    })
 };
