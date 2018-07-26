@@ -20,7 +20,7 @@ module.exports = (ws)=> {
         DiabetesMessage.find({_id:resp.id}).populate({path: 'userId',select: '_id name isDoc'}).then((message) => {
           wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
-        client.send('chat Diacare',message);
+        client.send(message);
       }
     });
         })
@@ -38,7 +38,7 @@ module.exports = (ws)=> {
         BabyandmeMessage.find({_id:resp.id}).populate({path: 'userId',select: '_id name isDoc'}).then((message) => {
           wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
-        client.send('chat Babyandme',message);
+        client.send(message);
       }
     });
         })
