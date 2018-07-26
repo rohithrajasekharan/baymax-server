@@ -1,5 +1,6 @@
 
 const express = require('express');
+const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const authRoutes = require('./routes/auth-routes');
@@ -15,7 +16,6 @@ const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const graphqlHTTP = require('express-graphql');
 const schema = require('./schema/schema');
-const socket = require('socket.io');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -55,5 +55,5 @@ app.use('/graphql', graphqlHTTP({
 const server = app.listen(PORT, () => {
   console.log('app listening on port '+PORT);
 })
-const io = module.exports.io = socket(server);
-io.on('connection', SocketManager);
+const wss = module.exports.wss = new WebSocket.Server({server});
+wss.on('connection', SocketManager);
