@@ -2,6 +2,8 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const User = require('../models/user-model');
+const Query = require('../models/query-model');
+const Email = require('../models/email-model');
 
 router.post('/register', (req, res) => {
   let name = req.body.name;
@@ -27,7 +29,8 @@ router.get('/user', (req,res) => {
 router.post('/login',
   passport.authenticate('local'),
   function(req, res) {
-    res.json(req.user);
+    console.log("request");
+    res.send("req.user");
     });
 
 router.get('/logout',(req,res) => {
@@ -35,6 +38,27 @@ router.get('/logout',(req,res) => {
   res.send(req.user)
 }
     );
-
+//Landing page form
+router.post('/message', (req, res) => {
+  let name = req.body.name;
+  let mail = req.body.mail;
+  let content = req.body.content;
+  let query = new Query({
+    name: name,
+    mail: mail,
+    content: content
+  });
+query.save().then(()=>{
+res.send('saved');
+});
+});
+router.post('/getstarted', (req, res) => {
+  let query = new Email({
+    email: req.body.email
+  });
+query.save().then(()=>{
+res.send('saved');
+});
+});
 
 module.exports = router;

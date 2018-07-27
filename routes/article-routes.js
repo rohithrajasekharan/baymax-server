@@ -10,10 +10,12 @@ router.post('/new', (req, res) => {
      title : req.body.title,
      content : req.body.content,
      userId : req.body.userId,
+     pageName: req.body.pageName,
      type : req.body.type,
      videoId : req.body.videoId,
      imageId : req.body.imageId,
      likes: 0,
+     weight: 5,
      comments: 0,
      createdAt: Date.now()
   });
@@ -24,27 +26,33 @@ router.post('/new', (req, res) => {
 
 router.post('/answer', (req, res) => {
   let newComment = new Answer({
-     answer : req.body.title,
+     answer : req.body.answer,
      articleId : req.body.articleId,
      userId : req.body.userId,
      type : req.body.type,
      votes: 0,
      createdAt: Date.now()
   });
-  Article.findOneAndUpdate({_id:req.body.articleId},{$inc:{'comments':1}});//Change this to something more efficient
-  newComment.save().then((answer)=>{
-    res.json(answer);
-  })
+  if (req.body.type=='question') {
+    Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 4}}).then(()=>{
+      res.json(newComment.save());
+    })
+  }else{
+    Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 1}}).then(()=>{
+      res.json(newComment.save());
+    })
+  }
+
 });
 
 router.post('/like', (req, res) => {
   if (req.body.type=='like') {
-  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : 1}, $push: { 'likedby': req.body.userId } }).then((data)=>{
+  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : 1,'weight' : 1}, $push: { 'likedby': req.body.userId } }).then((data)=>{
   res.send('Success');
   })
   }
   else if (req.body.type=='dislike') {
-  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : -1}, $pull: { 'likedby': req.body.userId } }).then((data)=>{
+  Article.findOneAndUpdate({_id :req.body.articleId}, {$inc : {'likes' : -1,'weight' : -1}, $pull: { 'likedby': req.body.userId } }).then((data)=>{
   res.send('Success');
   })
   }
@@ -67,7 +75,6 @@ router.post('/vote', (req, res) => {
   res.send('Downvoted');
   })
   }
-
 });
 
 router.get('/removearticle/:id', (req, res) => {
@@ -89,7 +96,7 @@ router.get('/removeanswer/:id', (req, res) => {
 });
 
 router.get('/bookmarks/:id',(req,res)=>{
-  User.findById(req.params.id).populate('bookmark').then((user)=>{
+  User.find({_id :req.params.id},{bookmark:1,_id:0}).populate({path: 'bookmark',select: '_id title userId content pageName imageId type createdAt comments',populate: {path: "userId",select:'_id name avatar isDoc'}}).populate('bookmark.userId').then((user)=>{
     res.json(user);
   })
 })
@@ -115,15 +122,23 @@ Article.find({'pageName': req.params.pageName},{title: 1, content: 1 ,type:1,vid
 });
 
 router.post('/answers', (req, res) => {
-  if(parseInt(req.body.limit)==null){
-    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).then((answers)=>{
+  if(parseInt(req.body.limit)==null && req.body.type=='question'){
+    Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'votes': -1}).then((answers)=>{
       res.json(answers);
-    }).sort({'_id':-1});
-  }else{
-Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).then((answers)=>{
+    });
+  }else if(parseInt(req.body.limit)!==null && req.body.type=='question'){
+Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'votes': -1}).then((answers)=>{
   res.json(answers);
 });
-  }
+}else if(parseInt(req.body.limit)==null && req.body.type!=='question'){
+  Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(30).sort({'_id': -1}).then((answers)=>{
+    res.json(answers);
+  });
+}else if(parseInt(req.body.limit)!==null && req.body.type!=='question'){
+  Answer.find({'articleId':req.body.id}).populate({path: 'userId',select: '_id name avatar isDoc'}).limit(parseInt(req.body.limit)).sort({'_id': -1}).then((answers)=>{
+    res.json(answers);
+  });
+}
   });
 
 
