@@ -7,6 +7,7 @@ const DiabetesMessageSchema = mongoose.Schema({
    message: String,
 	 type: String,
 	 replyto: [{type: Schema.Types.ObjectId, ref: 'DiabetesMessage'}],
+	 reply:String,
 	 time: Date
 });
 const BabyandmeMessageSchema = mongoose.Schema({
