@@ -17,11 +17,11 @@ router.post('/load',(req,res)=>{
         res.json(resp);
       });
   }else if (req.body.pageName==="Diabetes" && req.body.id!=="") {
-      DiacareMessage.find({_id: {$lt: req.body.id}}).limit(50).sort({_id:-1}).then((resp)=>{
+      DiacareMessage.find({_id: {$lt: req.body.id}}).limit(50).sort({_id:1}).then((resp)=>{
         res.json(resp);
       });
   }else {
-      BabyandmeMessage.find({_id: {$lt: req.body.id}}).limit(50).sort({_id:-1}).then((resp)=>{
+      BabyandmeMessage.find({_id: {$lt: req.body.id}}).limit(50).sort({_id:1}).then((resp)=>{
         res.json(resp);
       });
   }
