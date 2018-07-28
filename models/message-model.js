@@ -5,17 +5,22 @@ const User = require('./user-model');
 const DiabetesMessageSchema = mongoose.Schema({
 	 userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
    message: String,
+	 sender: String,
 	 type: String,
-	 replyto: [{type: Schema.Types.ObjectId, ref: 'DiabetesMessage'}],
+	 replyto: String,
 	 reply:String,
+	 replyId: [{type: Schema.Types.ObjectId, ref: 'DiabetesMessage'}],
 	 time: Date
 });
 const BabyandmeMessageSchema = mongoose.Schema({
-	 userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
-   message: String,
-	 type: String,
-	 replyto: [{type: Schema.Types.ObjectId, ref: 'BabyandmeMessage'}],
-	 time: Date
+	userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
+	message: String,
+	sender: String,
+	type: String,
+	replyto: String,
+	reply:String,
+	replyId: [{type: Schema.Types.ObjectId, ref: 'BabyandmeMessage'}],
+	time: Date
 });
 
 const DiabetesMessage = mongoose.model('diabetes_message', DiabetesMessageSchema);
