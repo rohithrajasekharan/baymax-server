@@ -16,7 +16,7 @@ module.exports = (ws)=> {
         reply: args.reply,
         replyId: args.replyId,
         isDoc: args.isDoc,
-        createdAt: new Date()
+        time: new Date()
       });
       newMessage.save().then((resp) => {
           wss.clients.forEach(function each(client) {
