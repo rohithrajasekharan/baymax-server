@@ -52,8 +52,20 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true
 }));
 
-const server = app.listen(PORT, () => {
-  console.log('app listening on port '+PORT);
-})
-const wss = module.exports.wss = new WebSocket.Server({server});
-wss.on('connection', SocketManager);
+
+// const wss = new WebSocket.Server({ server });
+// wss.on('connection', function connection(ws) {
+//     ws.on('message', function incoming(message) {
+//       console.log('received: %s', message);
+//     });
+   
+//     ws.send('something');
+//   });
+
+  module.exports=app;
+
+// const server = app.listen(PORT, () => {
+//   console.log('app listening on port '+PORT);
+// })
+// const wss = module.exports.wss = new WebSocket.Server({server});
+// wss.on('connection', SocketManager);
