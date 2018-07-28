@@ -15,6 +15,7 @@ module.exports = (ws)=> {
         replyto: args.replyto,
         reply: args.reply,
         replyId: args.replyId,
+        isDoc: args.isDoc,
         createdAt: new Date()
       });
       newMessage.save().then((resp) => {

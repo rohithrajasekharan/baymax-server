@@ -25,6 +25,11 @@ router.post('/register', (req, res) => {
 router.get('/user', (req,res) => {
   res.json(req.user)
 });
+router.get('/:id', (req,res) => {
+  User.findById(req.params.id, {name:1,isDoc:1,_id:1}).then((res)=>{
+    res.json(res);
+  })
+});
 
 router.post('/login',
   passport.authenticate('local'),
