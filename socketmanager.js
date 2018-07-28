@@ -8,6 +8,7 @@ module.exports = (ws)=> {
   console.log('connection is made');
   ws.on('message', (raw)=> {
     var args = JSON.parse(raw);
+    console.log(args);
     if (args.pageName=="Diacare") {
       let newMessage = new DiabetesMessage({
         message: args.data.message,
