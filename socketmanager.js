@@ -21,17 +21,17 @@ wss.on('connection', function connection(ws) {
       let newMessage = new DiabetesMessage({
         message: args.message,
         sender: args.sender,
-        userId: args.userId,
+        userId: [args.userId],
         type: args.type,
         replyto: args.replyto,
         reply: args.reply,
-        replyId: args.replyId,
+        replyId: [args.replyId],
         createdAt: new Date()
       });
       newMessage.save().then((resp) => {
           wss.clients.forEach(function each(client) {
               console.log(resp);
-              client.send(resp);
+              client.send(JSON.stringify(resp));
         })
       })
     }
