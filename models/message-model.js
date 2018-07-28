@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const User = require('./user-model');
 
-const DiabetesMessageSchema = mongoose.Schema({
+const DiacareMessageSchema = mongoose.Schema({
 	 userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
    message: String,
 	 sender: String,
 	 type: String,
 	 replyto: String,
 	 reply:String,
-	 replyId: [{type: Schema.Types.ObjectId, ref: 'DiabetesMessage'}],
+	 replyId: [{type: Schema.Types.ObjectId, ref: 'DiacareMessage'}],
 	 time: Date
 });
 const BabyandmeMessageSchema = mongoose.Schema({
@@ -23,10 +23,10 @@ const BabyandmeMessageSchema = mongoose.Schema({
 	time: Date
 });
 
-const DiabetesMessage = mongoose.model('diabetes_message', DiabetesMessageSchema);
+const DiacareMessage = mongoose.model('diacare_message', DiacareMessageSchema);
 const BabyandmeMessage = mongoose.model('babyandme_message', BabyandmeMessageSchema);
 
 module.exports = {
-  'DiabetesMessage': DiabetesMessage,
+  'DiacareMessage': DiacareMessage,
   'BabyandmeMessage': BabyandmeMessage
 }

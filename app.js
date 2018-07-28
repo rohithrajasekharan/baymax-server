@@ -19,6 +19,9 @@ const schema = require('./schema/schema');
 const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
+const server = app.listen(PORT, () => {
+  console.log('app listening on port '+PORT);
+})
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,20 +55,5 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true
 }));
 
-
-// const wss = new WebSocket.Server({ server });
-// wss.on('connection', function connection(ws) {
-//     ws.on('message', function incoming(message) {
-//       console.log('received: %s', message);
-//     });
-   
-//     ws.send('something');
-//   });
-
-  module.exports=app;
-
-// const server = app.listen(PORT, () => {
-//   console.log('app listening on port '+PORT);
-// })
-// const wss = module.exports.wss = new WebSocket.Server({server});
-// wss.on('connection', SocketManager);
+const wss = module.exports.wss = new WebSocket.Server({server});
+ wss.on('connection', SocketManager);
