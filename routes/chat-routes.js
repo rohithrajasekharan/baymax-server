@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 
 
 router.post('/load',(req,res)=>{
-  if (req.body.pageName==="Diacare" && req.body.id=="") {
+  if (req.body.pageName==="Diabetes" && req.body.id=="") {
       DiacareMessage.find().limit(50).sort({_id:-1}).then((resp)=>{
         res.json(resp);
       });
@@ -16,7 +16,7 @@ router.post('/load',(req,res)=>{
       BabyandmeMessage.find().limit(50).sort({_id:-1}).then((resp)=>{
         res.json(resp);
       });
-  }else if (req.body.pageName==="Diacare" && req.body.id!=="") {
+  }else if (req.body.pageName==="Diabetes" && req.body.id!=="") {
       DiacareMessage.find({_id: {$lt: req.body.id}}).limit(50).sort({_id:-1}).then((resp)=>{
         res.json(resp);
       });
