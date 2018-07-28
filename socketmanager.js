@@ -3,7 +3,6 @@ let server = require('http').createServer();
 let app = require('./app');
 const DiabetesMessage = require('./models/message-model').DiabetesMessage;
 
-<<<<<<< HEAD
 module.exports = (ws)=> {
   const WebSocket = require('ws');
   const DiabetesMessage = require('./models/message-model').DiabetesMessage;
@@ -15,7 +14,6 @@ module.exports = (ws)=> {
     var args = JSON.parse(raw);
     console.log(args);
     if (args.pageName=="Diacare") {
-=======
 // Create web socket server on top of a regular http server
 let wss = new WSServer({
   server: server
@@ -30,7 +28,6 @@ wss.on('connection', function connection(ws) {
     var args = JSON.parse(message);
     console.log(args);
     if (args.pageName == "Diacare") {
->>>>>>> d30f74734447be26e3dfaf58ad71e44536ab81ed
       let newMessage = new DiabetesMessage({
         message: args.message,
         userId: args.userId,
