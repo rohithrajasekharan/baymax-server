@@ -6,7 +6,7 @@ module.exports = (ws)=> {
   console.log('connection is made');
   ws.on('message', function incoming(message) {
     var args = JSON.parse(message);
-    console.log(message);
+
     if (args.pageName == "Diacare") {
       let newMessage = new DiacareMessage({
         message: args.message,
@@ -20,7 +20,10 @@ module.exports = (ws)=> {
         time: new Date()
       });
       newMessage.save().then((resp) => {
-          wss.connection.send(JSON.stringify(resp));
+          wss.clients.forEach(function each(client) {
+            console.log(client);
+            client.send(JSON.stringify(resp));
+        })
       })
     }
   });
