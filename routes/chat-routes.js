@@ -9,11 +9,11 @@ const Schema = mongoose.Schema;
 
 router.post('/load',(req,res)=>{
   if (req.body.pageName==="Diabetes" && req.body.id=="") {
-      DiacareMessage.find().limit(50).sort({_id:1}).then((resp)=>{
+      DiacareMessage.find().limit(50).sort({_id:-1}).then((resp)=>{
         res.json(resp);
       });
   }else if (req.body.pageName==="Baby and Me" && req.body.id==""){
-      BabyandmeMessage.find().limit(50).sort({_id:1}).then((resp)=>{
+      BabyandmeMessage.find().limit(50).sort({_id:-1}).then((resp)=>{
         res.json(resp);
       });
   }else if (req.body.pageName==="Diabetes" && req.body.id!=="") {

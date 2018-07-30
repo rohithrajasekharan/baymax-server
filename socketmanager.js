@@ -6,6 +6,7 @@ module.exports = (ws)=> {
   console.log('connection is made');
   ws.on('message', function incoming(message) {
     var args = JSON.parse(message);
+    console.log(message);
     if (args.pageName == "Diacare") {
       let newMessage = new DiacareMessage({
         message: args.message,
