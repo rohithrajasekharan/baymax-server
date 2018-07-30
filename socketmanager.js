@@ -4,6 +4,11 @@ module.exports = (ws)=> {
   const User = require('./models/user-model');
   const wss = require('./app.js').wss;
   console.log('connection is made');
+
+  ws.isAlive = true;
+  ws.on('pong', () => {
+       ws.isAlive = true;
+});
   ws.on('message', function incoming(message) {
     var args = JSON.parse(message);
 
@@ -27,4 +32,14 @@ module.exports = (ws)=> {
       })
     }
   });
+
+setInterval(() => {
+    wss.clients.forEach((client) => {
+
+        if (!client.isAlive) return client.terminate();
+
+        client.isAlive = false;
+        client.ping(null, false, true);
+    });
+}, 10000);
 }
