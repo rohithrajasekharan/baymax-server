@@ -4,7 +4,7 @@ module.exports = (ws)=> {
   const User = require('./models/user-model');
   const wss = require('./app.js').wss;
   console.log('connection is made');
-  var count=0;
+
   ws.isAlive = true;
   ws.on('pong', () => {
        ws.isAlive = true;
@@ -24,7 +24,7 @@ module.exports = (ws)=> {
         isDoc: args.isDoc,
         time: new Date()
       });
-
+      var count=0;
       newMessage.save().then((resp) => {
           wss.clients.forEach(function each(client) {
             count++;
@@ -34,8 +34,9 @@ module.exports = (ws)=> {
       })
     }
   });
-setInterval(() => {
 
+setInterval(() => {
+  var count=0;
     wss.clients.forEach((client) => {
       count++;
       console.log(count);
