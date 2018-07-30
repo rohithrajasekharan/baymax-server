@@ -24,9 +24,11 @@ module.exports = (ws)=> {
         isDoc: args.isDoc,
         time: new Date()
       });
+      var count=0;
       newMessage.save().then((resp) => {
           wss.clients.forEach(function each(client) {
-            console.log(client);
+            count++;
+            console.log(count);
             client.send(JSON.stringify(resp));
         })
       })
@@ -34,7 +36,10 @@ module.exports = (ws)=> {
   });
 
 setInterval(() => {
+  var count=0;
     wss.clients.forEach((client) => {
+      count++;
+      console.log(count);
         if (!client.isAlive) return client.terminate();
         client.isAlive = false;
         client.ping(null, false, true);
