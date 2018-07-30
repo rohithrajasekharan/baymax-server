@@ -35,11 +35,9 @@ module.exports = (ws)=> {
 
 setInterval(() => {
     wss.clients.forEach((client) => {
-
         if (!client.isAlive) return client.terminate();
-
         client.isAlive = false;
         client.ping(null, false, true);
     });
-}, 10000);
+}, 30000);
 }
