@@ -20,10 +20,7 @@ module.exports = (ws)=> {
         time: new Date()
       });
       newMessage.save().then((resp) => {
-          wss.clients.forEach(function each(client) {
-              console.log(resp);
-              client.send(JSON.stringify(resp));
-        })
+          wss.connection.send(JSON.stringify(resp));
       })
     }
   });
