@@ -16,7 +16,7 @@ router.get('/search',(req,res)=>{
   }
 
 })
-
+ 
 router.get('/home/:category',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
       res.json(products)
