@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 
 const PharmaHomeSchema = mongoose.Schema({
   category: String,
-  banner: [{type: Schema.Types.ObjectId, ref: 'Product'}],
-  primarylist: [{type: Schema.Types.ObjectId, ref: 'Product'}],
-  secondarylist: [{type: Schema.Types.ObjectId, ref: 'Product'}],
-  highlighted: [{type: Schema.Types.ObjectId, ref: 'Product'}],
-  rest: [{type: Schema.Types.ObjectId, ref: 'Product'}]
+  banner: [{
+    image: String,
+    title: String,
+    description: String,
+    url: String
+  }],
+  products: [{type: Schema.Types.ObjectId, ref: 'Product'}]
 });
 
-const PharmaHome = module.exports = mongoose.model('PharmaHome', PharmaHomeSchema);
+const PharmaHome = module.exports = mongoose.model('pharmahome', PharmaHomeSchema);
