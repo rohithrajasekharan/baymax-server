@@ -1,21 +1,34 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const User = require('../models/user-model');
+const User = require('./user-model');
 
-const MessagesSchema = mongoose.Schema({
-	 sendersId: String,
-	 username: String,
+const DiacareMessageSchema = mongoose.Schema({
+	 userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
    message: String,
+	 sender: String,
 	 type: String,
 	 replyto: String,
-	 replymessage: String,
+	 reply:String,
+	 isDoc: Boolean,
+	 replyId: [{type: Schema.Types.ObjectId, ref: 'DiacareMessage'}],
 	 time: Date
 });
+const BabyandmeMessageSchema = mongoose.Schema({
+	userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
+	message: String,
+	sender: String,
+	type: String,
+	replyto: String,
+	reply:String,
+	isDoc: Boolean,
+	replyId: [{type: Schema.Types.ObjectId, ref: 'BabyandmeMessage'}],
+	time: Date
+});
 
-const DiabetesMessage = mongoose.model('diabetes_message', MessagesSchema);
-const BabyandmeMessage = mongoose.model('babyandme_message', MessagesSchema);
+const DiacareMessage = mongoose.model('diacare_message', DiacareMessageSchema);
+const BabyandmeMessage = mongoose.model('babyandme_message', BabyandmeMessageSchema);
 
 module.exports = {
-  'DiabetesMessage': DiabetesMessage,
+  'DiacareMessage': DiacareMessage,
   'BabyandmeMessage': BabyandmeMessage
 }

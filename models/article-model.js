@@ -10,6 +10,7 @@ const ArticleSchema = mongoose.Schema({
 	videoId: String,
 	imageId: String,
 	likes: Number,
+	weight: Number,
 	comments: Number,
 	createdAt: Date,
 	likedby: [{type: Schema.Types.ObjectId, ref: 'User'}]
