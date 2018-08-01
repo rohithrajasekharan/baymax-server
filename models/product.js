@@ -11,7 +11,6 @@ const ProductSchema = mongoose.Schema({
   usage: String,
   caution: String,
   tags: [ String ],
-	similar: [{type: Schema.Types.ObjectId, ref: 'Product'}],
 	quantity: Number,
 	status: String
 });
