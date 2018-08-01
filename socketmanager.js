@@ -1,44 +1,48 @@
-module.exports = (socket)=> {
-  const Messages = require('./models/message-model');
+module.exports = (ws)=> {
+  const DiacareMessage = require('./models/message-model').DiacareMessage;
+  const BabyandmeMessage = require('./models/message-model').BabyandmeMessage;
   const User = require('./models/user-model');
-  const io = require('./app.js').io;
-  console.log("made socket connection", socket.id);
-  socket.on('chat message', (data)=> {
-    let newMessage = new Messages({
-      conversationId: data.conversationId,
-      message: data.message,
-      sendersId: data.sendersId,
-      createdAt: new Date()
-    });
-    newMessage.save().then((resp)=>{
-      Messages.find({_id:resp.id}).populate('sendersId').then((message) => {
-        io.sockets.emit('chat message',message)
+  const wss = require('./app.js').wss;
+  console.log('connection is made');
+
+  ws.isAlive = true;
+  ws.on('pong', () => {
+       ws.isAlive = true;
+});
+  ws.on('message', function incoming(message) {
+    var args = JSON.parse(message);
+
+    if (args.pageName == "Diacare") {
+      let newMessage = new DiacareMessage({
+        message: args.message,
+        sender: args.sender,
+        userId: args.userId,
+        type: args.type,
+        replyto: args.replyto,
+        reply: args.reply,
+        replyId: args.replyId,
+        isDoc: args.isDoc,
+        time: new Date()
+      });
+      var count=0;
+      newMessage.save().then((resp) => {
+          wss.clients.forEach(function each(client) {
+            count++;
+            console.log(count);
+            client.send(JSON.stringify(resp));
+        })
       })
-
-
-
-    })
-
-  })
-
-  socket.on('typing', function(user){
-    console.log(user+" is typing");
-      socket.broadcast.emit('typing', user);
+    }
   });
 
-  socket.on('disconnect', function(){
-      User.update({name:socket.username},{$set:{lasttimestamp:new Date()}}, {upsert: true});
-  });
-    socket.on('joinchat', function(username){
-    socket.username=username;
+setInterval(() => {
+  var count=0;
+    wss.clients.forEach((client) => {
+      count++;
+      console.log(count);
+        if (!client.isAlive) return client.terminate();
+        client.isAlive = false;
+        client.ping(null, false, true);
     });
-
-
-    socket.on('iamback',function(){
-      User.find({name:socket.username}).then((resp) => {
-          Messages.find({createdAt: {$gt: new Date(resp[0].lasttimestamp)}}).populate('sendersId').sort({_id:1}).then((data) => {
-            socket.emit('unreadmessages', data)
-          })
-      })
-    })
-};
+}, 30000);
+}
