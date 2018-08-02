@@ -1,8 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Product = require('../models/product');
 const PharmaHome = require('../models/pharmahome');
-const Cart = require('../models/cart-model')
+const Cart = require('../models/cart-model');
+const ObjectId = mongoose.Types.ObjectId;
 
 router.get('/search',(req,res)=>{
   if (req.query.category=="") {
@@ -16,18 +18,13 @@ router.get('/search',(req,res)=>{
   }
 
 })
- 
+
 router.get('/home/:category',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
       res.json(products)
     });
 });
 
-router.get('/products',(req, res)=> {
-  Product.find({}, (err,products)=>{
-    res.json(products);
-  })
-});
 router.post('/addquantity',(req,res)=>{
   Cart.findOneAndUpdate({userId: req.body.userId, productId: req.body.productId}, {$set: {quantity: req.body.quantity}} ).then(()=>{
     res.send("quantity updated")
@@ -39,7 +36,7 @@ router.get('/:id',(req, res)=> {
   })
 });
 router.get('/checkcart/:userid/:productid',(req,res)=>{
-Cart.find({'userId': req.params.userid, 'productId': req.params.productid},(err,resp)=>{
+Cart.find({userId: req.params.userid, productId: {$elemMatch : {$all: { [ObjectId(req.params.productid)]}}}},(err,resp)=>{
   if (err) {
     res.send(false);
   }else {
