@@ -16,7 +16,7 @@ router.get('/search',(req,res)=>{
   }
 
 })
- 
+
 router.get('/home/:category',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
       res.json(products)
@@ -80,7 +80,8 @@ Product.find( { _id : { $in: array } },{ name: 1, price: 1, image: 1, quantity: 
 router.post('/addtocart', (req,res)=>{
   let cart = new Cart({
     userId : req.body.userId,
-    productId : req.body.productId
+    productId : req.body.productId,
+    quantity: 1
   });
   cart.save().then((resp)=>{
   res.send("added to cart");
@@ -88,34 +89,22 @@ router.post('/addtocart', (req,res)=>{
 )
 })
 
-router.post('/checkout/:username', (req,res)=>{
-  let username = req.params.username;
-  let data = JSON.parse(req.body.data);
-  var array = [];
-  data.map((product)=>{
-    let productId = product.productId;
-    let quantity = product.quantity;
-    let status = 'awaiting confirmation'
-    User.update({'name':username},
-  {
-   $push : {
-      orders :  {
-               "productId": productId,
-               "quantity": quantity,
-               "status": status
-             }
-    }
-  }).then(()=>{
-    Product.find( { _id : { $in: [productId] } },{ name: 1, price: 1} ).then((resp)=>{
-      resp.quantity=quantity;
-
-        req.app.io.sockets.emit("notification", {"data": resp,"quantity": quantity});
-    });
-
+router.post('/checkout', (req,res)=>{
+  let userId = req.body.userId;
+  Cart.find({userId: userId}).then((resp)=>{
+    resp.map((cart)=>{
+      let order = new Order({
+        userId: userId,
+        productId: cart.productId,
+        quantity: cart.quantity,
+        status: "Awaiting Confirmation"
+      })
+      order.save();
+    })
+      resp.remove().then(()=>{
+        res.send("Added to orders")
+      })
   })
-  res.end('success');
-});
-
 })
 
 router.get('/removefromcart',(req,res)=>{
