@@ -130,4 +130,30 @@ router.get('/removefromcart',(req,res)=>{
   })
 })
 
+router.post('/address',(req, res)=> {
+  Address.find({userId:req.body.id},(err,address)=>{
+    console.log(err+address)
+    res.json(address);
+  })
+});
+
+router.post('/addAddress',(req, res)=> {
+  let newAddress= new Address({
+    userId:req.body.id,
+    addr:req.body.addr,
+    pincode:req.body.pincode
+  })
+  newAddress.save().then((address)=>{
+    res.json(address)
+  })
+});
+
+router.post('/removeAddress',(req, res)=> {
+  Address.findById(req.body.id).then((address)=>{
+    address.remove().then(()=>{
+      res.send('address removed')
+    })
+  })
+});
+
 module.exports = router;
