@@ -109,7 +109,7 @@ router.post('/checkout', (req,res)=>{
 
 router.get('/removefromcart',(req,res)=>{
   var userid=req.query.userid;
-  var Productid=req.query.productid;
+  var productid=req.query.productid;
   Cart.find({userId:userid, productId: productid}, (err, product)=>{
     if (err) {
       res.send("product not deleted");
