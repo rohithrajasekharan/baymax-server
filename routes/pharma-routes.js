@@ -17,7 +17,7 @@ router.get('/search',(req,res)=>{
 
 })
 
-router.get('/home/:category',(req, res)=> {
+router.post('/home/:category',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
       res.json(products)
     });
@@ -38,8 +38,8 @@ router.get('/:id',(req, res)=> {
     res.json(products);
   })
 });
-router.get('/checkcart/:userid/:productid',(req,res)=>{
-Cart.find({'userId': req.params.userid, 'productId': req.params.productid},(err,resp)=>{
+router.post('/checkcart',(req,res)=>{
+Cart.find({'userId': req.body.userid, 'productId': req.body.productid},(err,resp)=>{
   if (err) {
     res.send(false);
   }else {
@@ -47,32 +47,17 @@ Cart.find({'userId': req.params.userid, 'productId': req.params.productid},(err,
   }
 })
 })
-router.get('/cart/:userid', (req,res)=>{
-    let userid = req.params.userid;
+router.post('/cart', (req,res)=>{
+    let userid = req.body.userid;
    Cart.find({'userId': userid}).populate('productId').then((resp)=>{
      res.json(resp);
    });
 })
 
-router.get('/myorders/:username', (req,res)=>{
-    let username = req.params.username;
-   User.find({'name': username},(err,user)=>{
-   var array = [];
-   var quantityArray = [];
-user[0].orders.map((order)=>{
-  array.push(order.productId);
-  quantityArray.push(order.quantity);
-})
-Product.find( { _id : { $in: array } },{ name: 1, price: 1, image: 1, quantity: 1, status: 1 } ).then((resp)=>{
- for(i=0; i<array.length; i++){
-   console.log(resp[i]);
-  resp[i].quantity=quantityArray[i];
-  resp[i].status= "awaiting confirmation"
- }
- res.json(resp);
-
-})
-    })
+router.post('/myorders', (req,res)=>{
+  Order.find({userId:req.body.userId}).populate('productId').then((resp)=>{
+    res.json(resp);
+  })
 
 })
 
