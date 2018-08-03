@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+
 const ProductSchema = mongoose.Schema({
 	name: String,
 	brand: String,
@@ -15,4 +16,4 @@ const ProductSchema = mongoose.Schema({
 	status: String
 });
 
-const Product = module.exports = mongoose.model('pharma_product', ProductSchema);
+const Product = module.exports = mongoose.model('pharmaproduct', ProductSchema);
