@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const PharmaHome = require('../models/pharmahome');
 const Cart = require('../models/cart-model')
+const Order = require('../models/orders-model')
 const Product = require('../models/product');
 
 router.get('/search',(req,res)=>{
@@ -30,8 +31,12 @@ router.get('/products',(req, res)=> {
 });
 router.post('/addquantity',(req,res)=>{
   var quantity = parseInt(req.body.quantity)
-  Cart.findOneAndUpdate({"userId": req.body.userId, "productId": req.body.productId}, {$set: {quantity: req.body.quantity}} ).then((resp)=>{
-    res.send("quantity updated")
+  Cart.findOneAndUpdate({"userId": req.body.userid, "productId": req.body.productid}, {$set: {quantity: req.body.quantity}},{new:true} ).then((resp)=>{
+    if (resp.quantity==quantity) {
+      res.send("quantity updated")
+    }else{
+      res.send("cannot update quantity")
+    }
   })
 })
 router.get('/:id',(req, res)=> {
@@ -40,29 +45,54 @@ router.get('/:id',(req, res)=> {
   })
 });
 router.post('/checkcart',(req,res)=>{
-Cart.find({'userId': req.body.userid, 'productId': req.body.productid},(err,resp)=>{
-  if (err) {
-    res.send(false);
-  }else {
-    res.send(true);
-  }
+  var userid=req.body.userid;
+  var productid=req.body.productid;
+  Cart.find({userId:userid, productId: productid}, (err, product)=>{
+    if (err) {
+      res.send(false);
+    }else{
+      res.send(true);
+    }
+  })
 })
-})
+
 router.post('/cart', (req,res)=>{
     let userid = req.body.userid;
-   Cart.find({'userId': userid}).populate('productId').then((resp)=>{
+   Cart.find({'userId': userid}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
      res.json(resp);
    });
 })
 
 router.post('/myorders', (req,res)=>{
-  Order.find({userId:req.body.userId}).populate('productId').then((resp)=>{
+  Order.find({userId:req.body.userid}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
     res.json(resp);
   })
 
 })
-
-
+router.post('/getneworders',(req,res)=>{
+  Order.find({status:"Awaiting confirmation"}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
+    console.log(resp);
+    res.json(resp)
+  })
+})
+router.post('/confirmorder',(req,res)=>{
+  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Confirmed"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Confirmed") {
+      res.send("Order Confirmed")
+    }else{
+      res.send("Error confirming order")
+    }
+  })
+})
+router.post('/rejectorder',(req,res)=>{
+  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Confirmed") {
+      res.send("Order Rejected")
+    }else{
+      res.send("Error rejecting order")
+    }
+  })
+})
 router.post('/addtocart', (req,res)=>{
   let cart = new Cart({
     userId : req.body.userId,
@@ -96,7 +126,7 @@ router.post('/checkout', (req,res)=>{
 router.post('/removefromcart',(req,res)=>{
   var userid=req.body.userid;
   var productid=req.body.productid;
-  Cart.find({userId:userid, productId: productid}, (err, product)=>{
+  Cart.deleteOne({userId:userid, productId: productid}, (err, product)=>{
     if (err) {
       res.send("product not deleted");
     }else{
