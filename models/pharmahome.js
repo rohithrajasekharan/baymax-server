@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Product = require('./product');
 const Schema = mongoose.Schema;
+const Product = require('./product');
 
 const PharmaHomeSchema = mongoose.Schema({
   category: String,
@@ -10,7 +10,7 @@ const PharmaHomeSchema = mongoose.Schema({
     description: String,
     url: String
   }],
-  products: [{type: Schema.Types.ObjectId, ref: 'Product'}]
+  products: [{type: Schema.Types.ObjectId, ref: 'pharmaproduct'}]
 });
 
 const PharmaHome = module.exports = mongoose.model('pharmahome', PharmaHomeSchema);

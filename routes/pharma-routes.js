@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/product');
 const PharmaHome = require('../models/pharmahome');
 const Cart = require('../models/cart-model')
+const Product = require('../models/product');
 
 router.get('/search',(req,res)=>{
   if (req.query.category=="") {
@@ -17,8 +17,8 @@ router.get('/search',(req,res)=>{
 
 })
 
-router.post('/home/:category',(req, res)=> {
-    PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
+router.post('/home',(req, res)=> {
+    PharmaHome.find({category: req.body.category}).populate({path :'products',select: 'name price image'}).then((products)=>{
       res.json(products)
     });
 });
@@ -29,7 +29,8 @@ router.get('/products',(req, res)=> {
   })
 });
 router.post('/addquantity',(req,res)=>{
-  Cart.findOneAndUpdate({userId: req.body.userId, productId: req.body.productId}, {$set: {quantity: req.body.quantity}} ).then(()=>{
+  var quantity = parseInt(req.body.quantity)
+  Cart.findOneAndUpdate({"userId": req.body.userId, "productId": req.body.productId}, {$set: {quantity: req.body.quantity}} ).then((resp)=>{
     res.send("quantity updated")
   })
 })
