@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const PharmaHome = require('../models/pharmahome');
-const Cart = require('../models/cart-model')
-const Order = require('../models/orders-model')
+const Cart = require('../models/cart-model');
+const Address = require('../models/address-model');
+const Order = require('../models/orders-model');
 const Product = require('../models/product');
 
 router.get('/search',(req,res)=>{
@@ -137,15 +138,15 @@ router.post('/removefromcart',(req,res)=>{
 
 router.post('/address',(req, res)=> {
   Address.find({userId:req.body.id},(err,address)=>{
-    console.log(err+address)
+    console.log(err+address);
     res.json(address);
-  })
+  }).populate({path:"userId",select:"name"})
 });
 
 router.post('/addAddress',(req, res)=> {
   let newAddress= new Address({
     userId:req.body.id,
-    addr:req.body.addr,
+    addr: ObjectId(req.body.addr),
     pincode:req.body.pincode
   })
   newAddress.save().then((address)=>{
