@@ -1,21 +1,10 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const PharmaHome = require('../models/pharmahome');
-<<<<<<< HEAD
-<<<<<<< HEAD
-const Cart = require('../models/cart-model');
-const ObjectId = mongoose.Types.ObjectId;
-=======
 const Cart = require('../models/cart-model')
 const Order = require('../models/orders-model')
-=======
-const Cart = require('../models/cart-model');
 const Address = require('../models/address-model');
-const Order = require('../models/orders-model');
->>>>>>> 0996d69b80259e2076cffddb2cd0062268ef19c5
 const Product = require('../models/product');
->>>>>>> d109716846115d290a504de973d89c74336fb190
 
 router.get('/search',(req,res)=>{
   if (req.query.category=="") {
@@ -30,17 +19,17 @@ router.get('/search',(req,res)=>{
 
 })
 
-<<<<<<< HEAD
-router.get('/home/:category',(req, res)=> {
-    PharmaHome.find({category: req.body.category}).populate('banner primarylist secondarylist highlighted rest').then((products)=>{
-=======
 router.post('/home',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate({path :'products',select: 'name price image'}).then((products)=>{
->>>>>>> d109716846115d290a504de973d89c74336fb190
       res.json(products)
     });
 });
 
+router.get('/products',(req, res)=> {
+  Product.find({}, (err,products)=>{
+    res.json(products);
+  })
+});
 router.post('/addquantity',(req,res)=>{
   var quantity = parseInt(req.body.quantity)
   Cart.findOneAndUpdate({"userId": req.body.userid, "productId": req.body.productid}, {$set: {quantity: req.body.quantity}},{new:true} ).then((resp)=>{
@@ -56,16 +45,6 @@ router.get('/:id',(req, res)=> {
     res.json(products);
   })
 });
-<<<<<<< HEAD
-router.get('/checkcart/:userid/:productid',(req,res)=>{
-Cart.find({userId: req.params.userid, productId: {$elemMatch : {$all: { [ObjectId(req.params.productid)]}}}},(err,resp)=>{
-  if (err) {
-    res.send(false);
-  }else {
-    res.send(true);
-  }
-})
-=======
 router.post('/checkcart',(req,res)=>{
   var userid=req.body.userid;
   var productid=req.body.productid;
@@ -76,7 +55,6 @@ router.post('/checkcart',(req,res)=>{
       res.send(true);
     }
   })
->>>>>>> d109716846115d290a504de973d89c74336fb190
 })
 
 router.post('/cart', (req,res)=>{
