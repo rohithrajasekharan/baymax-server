@@ -3,11 +3,17 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const PharmaHome = require('../models/pharmahome');
 <<<<<<< HEAD
+<<<<<<< HEAD
 const Cart = require('../models/cart-model');
 const ObjectId = mongoose.Types.ObjectId;
 =======
 const Cart = require('../models/cart-model')
 const Order = require('../models/orders-model')
+=======
+const Cart = require('../models/cart-model');
+const Address = require('../models/address-model');
+const Order = require('../models/orders-model');
+>>>>>>> 0996d69b80259e2076cffddb2cd0062268ef19c5
 const Product = require('../models/product');
 >>>>>>> d109716846115d290a504de973d89c74336fb190
 
@@ -64,7 +70,7 @@ router.post('/checkcart',(req,res)=>{
   var userid=req.body.userid;
   var productid=req.body.productid;
   Cart.find({userId:userid, productId: productid}, (err, product)=>{
-    if (err) {
+    if (product.length==0) {
       res.send(false);
     }else{
       res.send(true);
@@ -154,15 +160,15 @@ router.post('/removefromcart',(req,res)=>{
 
 router.post('/address',(req, res)=> {
   Address.find({userId:req.body.id},(err,address)=>{
-    console.log(err+address)
+    console.log(err+address);
     res.json(address);
-  })
+  }).populate({path:"userId",select:"name"})
 });
 
 router.post('/addAddress',(req, res)=> {
   let newAddress= new Address({
     userId:req.body.id,
-    addr:req.body.addr,
+    addr: ObjectId(req.body.addr),
     pincode:req.body.pincode
   })
   newAddress.save().then((address)=>{
