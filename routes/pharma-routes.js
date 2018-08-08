@@ -49,7 +49,7 @@ router.post('/checkcart',(req,res)=>{
   var userid=req.body.userid;
   var productid=req.body.productid;
   Cart.find({userId:userid, productId: productid}, (err, product)=>{
-    if (err) {
+    if (product.length==0) {
       res.send(false);
     }else{
       res.send(true);
