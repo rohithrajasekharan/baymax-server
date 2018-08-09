@@ -18,7 +18,26 @@ router.get('/search',(req,res)=>{
   }
 
 })
-
+router.get('/order/count',(req,res)=>{
+  Order.find().count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/acceptedorder/count',(req,res)=>{
+  Order.find({status: "Order Accepted"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/rejectedorder/count',(req,res)=>{
+  Order.find({status: "Order Rejected"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/neworder/count',(req,res)=>{
+  Order.find({status: "Awaiting confirmation"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
 router.post('/home',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate({path :'products',select: 'name price image'}).then((products)=>{
       res.json(products)
@@ -96,18 +115,20 @@ router.post('/getneworders',(req,res)=>{
     res.json(resp)
   })
 })
-router.post('/confirmorder',(req,res)=>{
-  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Confirmed"}},{new:true} ).then((resp)=>{
-    if (resp.status=="Order Confirmed") {
-      res.send("Order Confirmed")
+router.get('/confirmorder/:orderid',(req,res)=>{
+  console.log("order deal");
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Accepted"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Accepted") {
+      res.send("Order Accepted")
     }else{
       res.send("Error confirming order")
     }
   })
 })
-router.post('/rejectorder',(req,res)=>{
-  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
-    if (resp.status=="Order Confirmed") {
+router.get('/rejectorder/:orderid',(req,res)=>{
+  console.log("order deal");
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Rejected") {
       res.send("Order Rejected")
     }else{
       res.send("Error rejecting order")
@@ -134,7 +155,7 @@ router.post('/checkout', (req,res)=>{
         userId: userId,
         productId: cart.productId,
         quantity: cart.quantity,
-        status: "Awaiting Confirmation",
+        status: "Awaiting confirmation",
         addressId: req.body.addressId
       })
       order.save();
