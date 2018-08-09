@@ -70,9 +70,29 @@ router.post('/myorders', (req,res)=>{
   })
 
 })
-router.post('/getneworders',(req,res)=>{
-  Order.find({status:"Awaiting confirmation"}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
+router.post('/orders',(req,res)=>{
+  console.log("all");
+  Order.find().populate({path:'productId',select:'name price brand image'}).then((resp)=>{
     console.log(resp);
+    res.json(resp)
+
+  })
+})
+router.post('/rejectedorders',(req,res)=>{
+  Order.find({status: "Order Rejected"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("Reject");
+    res.json(resp)
+  })
+})
+router.post('/acceptedorders',(req,res)=>{
+  Order.find({status: "Order Accepted"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("Accept");
+    res.json(resp)
+  })
+})
+router.post('/getneworders',(req,res)=>{
+  Order.find({status:"Awaiting confirmation"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("New");
     res.json(resp)
   })
 })
@@ -114,7 +134,8 @@ router.post('/checkout', (req,res)=>{
         userId: userId,
         productId: cart.productId,
         quantity: cart.quantity,
-        status: "Awaiting Confirmation"
+        status: "Awaiting Confirmation",
+        addressId: req.body.addressId
       })
       order.save();
     })
