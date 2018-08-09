@@ -118,9 +118,10 @@ router.post('/checkout', (req,res)=>{
       })
       order.save();
     })
-      resp.remove().then(()=>{
-        res.send("Added to orders")
-      })
+  }).then(()=>{
+    Cart.remove({userId:userId},(err,resp)=>{
+        res.send("Added to Orders")
+    })
   })
 })
 
