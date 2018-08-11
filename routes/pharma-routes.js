@@ -116,11 +116,12 @@ router.post('/checkout', (req,res)=>{
         quantity: cart.quantity,
         status: "Awaiting Confirmation"
       })
-      order.save();
-    })
       resp.remove().then(()=>{
-        res.send("Added to orders")
+        order.save().then(()=>{
+          res.send("Added to orders")
+        })
       })
+    })
   })
 })
 
