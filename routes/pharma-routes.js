@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const PharmaHome = require('../models/pharmahome');
-const Cart = require('../models/cart-model');
+const Cart = require('../models/cart-model')
+const Order = require('../models/orders-model')
 const Address = require('../models/address-model');
-const Order = require('../models/orders-model');
 const Product = require('../models/product');
 
 router.get('/search',(req,res)=>{
@@ -18,7 +18,26 @@ router.get('/search',(req,res)=>{
   }
 
 })
-
+router.get('/order/count',(req,res)=>{
+  Order.find().count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/acceptedorder/count',(req,res)=>{
+  Order.find({status: "Order Accepted"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/rejectedorder/count',(req,res)=>{
+  Order.find({status: "Order Rejected"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
+router.get('/neworder/count',(req,res)=>{
+  Order.find({status: "Awaiting confirmation"}).count().then((resp)=>{
+    res.json(resp)
+  })
+})
 router.post('/home',(req, res)=> {
     PharmaHome.find({category: req.body.category}).populate({path :'products',select: 'name price image'}).then((products)=>{
       res.json(products)
@@ -70,24 +89,53 @@ router.post('/myorders', (req,res)=>{
   })
 
 })
-router.post('/getneworders',(req,res)=>{
-  Order.find({status:"Awaiting confirmation"}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
+router.post('/orders',(req,res)=>{
+  console.log("all");
+  Order.find().populate({path:'productId',select:'name price brand image'}).then((resp)=>{
     console.log(resp);
+    res.json(resp)
+
+  })
+})
+router.post('/rejectedorders',(req,res)=>{
+  Order.find({status: "Order Rejected"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("Reject");
     res.json(resp)
   })
 })
-router.post('/confirmorder',(req,res)=>{
-  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Confirmed"}},{new:true} ).then((resp)=>{
-    if (resp.status=="Order Confirmed") {
-      res.send("Order Confirmed")
+router.post('/acceptedorders',(req,res)=>{
+  Order.find({status: "Order Accepted"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("Accept");
+    res.json(resp)
+  })
+})
+router.post('/getneworders',(req,res)=>{
+  Order.find({status:"Awaiting confirmation"}).populate({path:'productId',select:'name price brand image'}).sort({"_id":-1}).limit(40).then((resp)=>{
+    console.log("New");
+    res.json(resp)
+  })
+})
+router.get('/confirmorder/:orderid',(req,res)=>{
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Accepted"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Accepted") {
+      res.send("Order Accepted")
     }else{
       res.send("Error confirming order")
     }
   })
 })
-router.post('/rejectorder',(req,res)=>{
-  Cart.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
-    if (resp.status=="Order Confirmed") {
+router.get('/cancelorder/:orderid',(req,res)=>{
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Cancelled"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Cancelled") {
+      res.send("Order Cancelled")
+    }else{
+      res.send("Error confirming order")
+    }
+  })
+})
+router.get('/rejectorder/:orderid',(req,res)=>{
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Rejected") {
       res.send("Order Rejected")
     }else{
       res.send("Error rejecting order")
@@ -114,13 +162,16 @@ router.post('/checkout', (req,res)=>{
         userId: userId,
         productId: cart.productId,
         quantity: cart.quantity,
-        status: "Awaiting Confirmation"
+        status: "Awaiting confirmation",
+        addressId: req.body.addressId
       })
-      resp.remove().then(()=>{
-        order.save().then(()=>{
-          res.send("Added to orders")
-        })
-      })
+
+      order.save();
+    })
+  }).then(()=>{
+    Cart.remove({userId:userId},(err,resp)=>{
+        res.send("Added to Orders")
+
     })
   })
 })
