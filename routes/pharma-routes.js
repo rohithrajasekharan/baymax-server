@@ -116,7 +116,6 @@ router.post('/getneworders',(req,res)=>{
   })
 })
 router.get('/confirmorder/:orderid',(req,res)=>{
-  console.log("order deal");
   Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Accepted"}},{new:true} ).then((resp)=>{
     if (resp.status=="Order Accepted") {
       res.send("Order Accepted")
@@ -125,8 +124,16 @@ router.get('/confirmorder/:orderid',(req,res)=>{
     }
   })
 })
+router.get('/cancelorder/:orderid',(req,res)=>{
+  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Cancelled"}},{new:true} ).then((resp)=>{
+    if (resp.status=="Order Cancelled") {
+      res.send("Order Cancelled")
+    }else{
+      res.send("Error confirming order")
+    }
+  })
+})
 router.get('/rejectorder/:orderid',(req,res)=>{
-  console.log("order deal");
   Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Rejected"}},{new:true} ).then((resp)=>{
     if (resp.status=="Order Rejected") {
       res.send("Order Rejected")
