@@ -37,6 +37,7 @@ router.get('/neworder/count',(req,res)=>{
   Order.find({status: "Awaiting confirmation"}).count().then((resp)=>{
     res.json(resp)
   })
+})
 router.post('/cart/count',(req,res)=>{
     Cart.find({userId:req.body.id}).count().then((resp)=>{
       res.json(resp)
