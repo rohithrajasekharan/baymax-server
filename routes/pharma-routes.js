@@ -169,11 +169,13 @@ router.post('/checkout', (req,res)=>{
         status: "Awaiting confirmation",
         addressId: req.body.addressId
       })
+
       order.save();
     })
   }).then(()=>{
     Cart.remove({userId:userId},(err,resp)=>{
         res.send("Added to Orders")
+
     })
   })
 })
@@ -200,7 +202,7 @@ router.post('/address',(req, res)=> {
 router.post('/addAddress',(req, res)=> {
   let newAddress= new Address({
     userId:req.body.id,
-    addr: ObjectId(req.body.addr),
+    addr: req.body.addr,
     pincode:req.body.pincode
   })
   newAddress.save().then((address)=>{
