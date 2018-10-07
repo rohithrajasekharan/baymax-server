@@ -10,6 +10,7 @@ const DiacareMessageSchema = mongoose.Schema({
 	 replyto: String,
 	 reply:String,
 	 isDoc: Boolean,
+	 imageUrl: String,
 	 replyId: [{type: Schema.Types.ObjectId, ref: 'DiacareMessage'}],
 	 time: Date
 });
@@ -21,6 +22,7 @@ const BabyandmeMessageSchema = mongoose.Schema({
 	replyto: String,
 	reply:String,
 	isDoc: Boolean,
+	imageUrl: String,
 	replyId: [{type: Schema.Types.ObjectId, ref: 'BabyandmeMessage'}],
 	time: Date
 });

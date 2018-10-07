@@ -9,6 +9,7 @@ const feedRoutes = require('./routes/feed-routes');
 const pharmaRoutes = require('./routes/pharma-routes');
 const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
+const hospitalRoutes = require('./routes/hospital-routes');
 const indexRoutes = require('./routes/index-routes');
 const localAuth = require('./config/local-auth');
 const bodyParser = require('body-parser');
@@ -45,6 +46,7 @@ app.use('/notification', notifRoutes);
 app.use('/feed', feedRoutes);
 app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
+app.use('/hospital', hospitalRoutes);
 
 mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme', () => {
     console.log("connected to db");
@@ -56,4 +58,4 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 const wss = module.exports.wss = new WebSocket.Server({server});
- wss.on('connection', SocketManager);
+wss.on('connection', SocketManager);

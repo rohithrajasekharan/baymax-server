@@ -22,7 +22,8 @@ module.exports = (ws)=> {
         reply: args.reply,
         replyId: args.replyId,
         isDoc: args.isDoc,
-        time: new Date()
+        time: new Date(),
+        imageUrl: args.imageUrl
       });
       var count=0;
       newMessage.save().then((resp) => {

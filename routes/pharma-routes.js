@@ -120,8 +120,9 @@ router.post('/getneworders',(req,res)=>{
     res.json(resp)
   })
 })
-router.get('/confirmorder/:orderid',(req,res)=>{
-  Order.findOneAndUpdate({"_id": req.params.orderid}, {$set: {status: "Order Accepted"}},{new:true} ).then((resp)=>{
+router.post('/confirmorder',(req,res)=>{
+  Order.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Accepted"}},{new:true} ).then((resp)=>{
+    console.log(resp);
     if (resp.status=="Order Accepted") {
       res.send("Order Accepted")
     }else{
@@ -131,6 +132,7 @@ router.get('/confirmorder/:orderid',(req,res)=>{
 })
 router.post('/cancelorder',(req,res)=>{
   Order.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Cancelled",statusmsg: req.body.msg}},{new:true} ).then((resp)=>{
+    console.log(resp);
     if (resp.status=="Order Cancelled") {
       res.send("Order Cancelled")
     }else{
@@ -140,6 +142,7 @@ router.post('/cancelorder',(req,res)=>{
 })
 router.post('/rejectorder',(req,res)=>{
   Order.findOneAndUpdate({"_id": req.body.orderid}, {$set: {status: "Order Rejected",statusmsg: req.body.msg}},{new:true} ).then((resp)=>{
+    console.log(resp);
     if (resp.status=="Order Rejected") {
       res.send("Order Rejected")
     }else{
