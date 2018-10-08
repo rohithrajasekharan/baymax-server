@@ -30,6 +30,14 @@ router.get('/:id', (req,res) => {
     res.json(res);
   })
 });
+//initial call without authentication code
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile']
+}));
+//redirect to the url specified with auth code
+router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
+  res.redirect('/');
+});
 
 router.post('/login',
   passport.authenticate('local'),
