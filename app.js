@@ -12,6 +12,7 @@ const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
 const indexRoutes = require('./routes/index-routes');
 const localAuth = require('./config/local-auth');
+const googleAuth = require('./config/google-auth');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');

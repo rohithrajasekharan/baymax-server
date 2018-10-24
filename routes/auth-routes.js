@@ -38,7 +38,30 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
   res.redirect('/');
 });
-
+router.post('/applogin', (req,res)=>{
+  User.find({googleId:req.body.googleId},(err,user)=>{
+    if (user) {
+      res.send(user);
+    }else{
+      let name = req.body.name;
+      let email = req.body.email;
+      let password = req.body.password;
+      let googleId = req.body.googleId;
+      let newUser = new User({
+        name: name,
+        email: email,
+        password: password,
+        googleId: googleId,
+        logintype: "local"
+      });
+      User.createUser(newUser, (err, user) => {
+        passport.authenticate('local')(req, res, function () {
+                    res.json(user);
+                })
+      });
+    }
+  })
+})
 router.post('/login',
   passport.authenticate('local'),
   function(req, res) {
