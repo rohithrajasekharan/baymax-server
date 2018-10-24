@@ -2,7 +2,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const User = require('../models/user-model');
-var config = require('../config');
 
 //store user in the session (can be called from the app as one for all setup)
 passport.serializeUser((user, done) => {
@@ -19,8 +18,8 @@ passport.deserializeUser((id, done) => {
 passport.use(
     new GoogleStrategy({
       callbackURL: '/auth/google/redirect',
-      clientID: config.clientID ,
-      clientSecret: config.clientSecret
+      clientID: '880942137557-rndats23qikhetn9cg124ttlam0fr3e6.apps.googleusercontent.com',
+      clientSecret: 'G2sf84QTqcCZkv9CrkkVThWc'
     }, (accessToken, refreshToken, profile, done) => {
         User.findOne({googleId: profile.id}).then((currentUser) => {
           console.log(profile);
