@@ -6,4 +6,11 @@ router.get('/:id',(req,res)=>{
     res.json(data);
   });
 })
+
+router.get('/searchhospital',(req,res)=>{
+    Hospital.find({$text: {$search: req.query.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
+      res.json(response);
+    })
+})
+
 module.exports = router;
