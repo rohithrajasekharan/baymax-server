@@ -41,7 +41,7 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
 router.post('/applogin', (req,res)=>{
   User.find({googleId:req.body.googleId},(err,user)=>{
     if (user) {
-      res.send(user,"already exists");
+      res.send({user,"already exists"});
     }else{
       let name = req.body.name;
       let email = req.body.email;
