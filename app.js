@@ -49,7 +49,8 @@ app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
 app.use('/hospital', hospitalRoutes);
 
-mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme', () => {
+mongoose.set('useCreateIndex', true)
+mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme',{ useNewUrlParser: true }, () => {
     console.log("connected to db");
 });
 
