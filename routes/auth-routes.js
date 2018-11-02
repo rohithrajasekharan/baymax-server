@@ -42,7 +42,7 @@ router.post('/applogin', (req,res)=>{
   User.find({googleId:req.body.googleId},(err,user)=>{
     if (user) {
       var data = {
-  user: user,
+  usr: user,
   msg: "user already exists"
 };
       res.send(data);
