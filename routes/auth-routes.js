@@ -45,7 +45,7 @@ router.post('/applogin', (req,res)=>{
   usr: user,
   msg: "user already exists"
 };
-      res.send(data);
+      res.send(user);
     }else{
       let name = req.body.name;
       let email = req.body.email;
