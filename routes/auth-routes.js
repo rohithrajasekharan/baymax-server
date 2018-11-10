@@ -41,12 +41,14 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
 router.post('/applogin', (req,res)=>{
   User.find({googleId:req.body.googleId},(err,user)=>{
     if (user) {
+      console.log(user);
       var data = {
   usr: user,
   msg: "user already exists"
 };
       res.send(user);
     }else{
+      console.log(err);
       let name = req.body.name;
       let email = req.body.email;
       let googleId = req.body.googleId;

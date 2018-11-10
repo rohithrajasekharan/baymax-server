@@ -27,11 +27,11 @@ router.post('/load',(req,res)=>{
   }
 })
 router.get('/new/:pageName/:id',(req,res)=>{
-  if (req.params.pageName=="Diacare") {
+  if (req.params.pageName=="Diabetes") {
       DiacareMessage.find({_id: {$gt: req.params.id}}).limit(20).count().then((resp)=>{
         res.json(resp);
       });
-  }else if (req.params.pageName=="babyandme"){
+  }else if (req.params.pageName=="Baby and Me"){
       BabyandmeMessage.find({_id: {$gt: req.params.id}}).limit(20).count().then((resp)=>{
         res.json(resp);
       });
