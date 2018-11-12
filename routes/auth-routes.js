@@ -39,16 +39,14 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
   res.redirect('/');
 });
 router.post('/applogin', (req,res)=>{
-  User.find({googleId:req.body.googleId},(err,user)=>{
-    if (user) {
-      console.log(user);
+  User.find({googleId:req.body.googleId}).then((user)=>{
+    if (user.length!==0) {
       var data = {
-  usr: user,
-  msg: "user already exists"
-};
-      res.send(user);
+        user: user,
+        message: "user already exists"
+      }
+      res.send(data);
     }else{
-      console.log(err);
       let name = req.body.name;
       let email = req.body.email;
       let googleId = req.body.googleId;
@@ -56,16 +54,16 @@ router.post('/applogin', (req,res)=>{
         name: name,
         email: email,
         googleId: googleId,
-        logintype: "local"
+        logintype: "google"
       });
-      User.createUser(newUser, (err, user) => {
-        passport.authenticate('local')(req, res, function () {
-                    res.json(user);
-                })
-      });
+      newUser.save().then((user)=>{
+        console.log(user);
+        res.json(user);
+      })
     }
   })
 })
+
 router.post('/login',
   passport.authenticate('local'),
   function(req, res) {
