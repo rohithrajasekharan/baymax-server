@@ -7,7 +7,7 @@ router.get('/:id',(req,res)=>{
   });
 })
 
-router.get('/search',(req,res)=>{
+router.get('/search/:keyword',(req,res)=>{
     Hospital.find({$text: {$search: req.params.keyword}}, {score: {$meta: "textScore"}}).sort({score:{$meta:"textScore"}}).then((response)=>{
       res.json(response);
     })
