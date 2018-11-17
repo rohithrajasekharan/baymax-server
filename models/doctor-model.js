@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Hospital = require('../hospital-model');
+const Hospital = require('./hospital-model');
+const Schema = mongoose.Schema;
 
 const doctorSchema = mongoose.Schema({
   name: String,
