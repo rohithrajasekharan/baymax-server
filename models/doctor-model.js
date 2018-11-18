@@ -6,6 +6,7 @@ const doctorSchema = mongoose.Schema({
   name: String,
   qualifications: String,
   rating: Number,
+  location: String,
   hasProfile: Boolean,
   visits: [{type: Schema.Types.ObjectId, ref: 'Hospital'}],
   canBook: Boolean,

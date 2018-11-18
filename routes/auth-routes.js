@@ -22,6 +22,13 @@ router.post('/register', (req, res) => {
   });
 });
 
+
+router.post('/addcommunity',(req,res)=>{
+    User.findOneAndUpdate({"_id": req.body.id}, {$set: {community: req.body.community}},{new:true}).then((data)=>{
+      res.json(data);
+    })
+})
+
 router.get('/user', (req,res) => {
   res.json(req.user)
 });

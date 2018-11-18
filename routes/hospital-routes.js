@@ -7,7 +7,7 @@ router.get('/:id',(req,res)=>{
     res.json(data);
   });
 })
-router.get('doctor/:id',(req,res)=>{
+router.get('/doctor/:id',(req,res)=>{
   Doctor.findById(req.params.id).then((data)=>{
     res.json(data);
   });

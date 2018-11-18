@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema({
 	facebookId: String,
 	avatar: String,
   logintype: String,
+	community: String,
 	lasttimestamp: Date,
 	bookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}]
 });

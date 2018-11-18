@@ -8,6 +8,7 @@ const hospitalSchema = mongoose.Schema({
   long: Number,
   lat: Number,
   placeid: String,
+  location: String,
   benefits: String
 });
 
