@@ -8,7 +8,7 @@ const doctorSchema = mongoose.Schema({
   rating: Number,
   location: String,
   hasProfile: Boolean,
-  visits: [{type: Schema.Types.ObjectId, ref: 'Hospital'}],
+  visits: [{type: Schema.Types.ObjectId, ref: 'hospital'}],
   canBook: Boolean,
   image: String
 });
