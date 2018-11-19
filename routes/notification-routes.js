@@ -19,6 +19,11 @@ router.get("/",(req,res)=>{
             else res.send("success")
         })
     }
+    else if(dpos=="general"){
+        Notif.find({userid:"global"}).exec((err,result)=>{
+              res.json(result)
+        })
+    }
     else {
         Notif.findByIdAndDelete(dpos,(err,result)=>{
             if(err)res.send("failed")
