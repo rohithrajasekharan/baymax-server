@@ -8,7 +8,7 @@ router.get('/:id',(req,res)=>{
   });
 })
 router.get('/doctor/:id',(req,res)=>{
-  Doctor.findById(req.params.id).populate({path :'visits',select: '_id name description logo rating integrated'}).then((data)=>{
+  Doctor.findById(req.params.id).populate({path :'visits',select: '_id name description logo rating integrated'}).populate({path :'timing.id',select: '_id name description logo rating integrated'}).then((data)=>{
     res.json(data);
   });
 })
