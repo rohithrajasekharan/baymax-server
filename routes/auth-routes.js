@@ -38,13 +38,17 @@ router.get('/:id', (req,res) => {
   })
 });
 //initial call without authentication code
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile']
+router.get('/login/google', passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email']
 }));
-//redirect to the url specified with auth code
+
+// callback route for google to redirect to
+// hand control to passport to use code to grab profile info
 router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
-  res.redirect('/');
+    res.json(req.user);
 });
+
 router.post('/applogin', (req,res)=>{
   User.find({googleId:req.body.googleId}).then((user)=>{
     if (user.length!==0) {

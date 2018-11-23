@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const authRoutes = require('./routes/auth-routes');
+const passportSetup = require('./config/google-auth');
 const articleRoutes = require('./routes/article-routes');
 const feedRoutes = require('./routes/feed-routes');
 const pharmaRoutes = require('./routes/pharma-routes');
@@ -11,8 +12,6 @@ const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
 const indexRoutes = require('./routes/index-routes');
-const localAuth = require('./config/local-auth');
-const googleAuth = require('./config/google-auth');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -40,6 +39,12 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+mongoose.set('useCreateIndex', true)
+mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme',{ useNewUrlParser: true }, () => {
+    console.log("connected to db");
+});
+
+
 app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/article', articleRoutes);
@@ -48,11 +53,6 @@ app.use('/feed', feedRoutes);
 app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
 app.use('/hospital', hospitalRoutes);
-
-mongoose.set('useCreateIndex', true)
-mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme',{ useNewUrlParser: true }, () => {
-    console.log("connected to db");
-});
 
 app.use('/graphql', graphqlHTTP({
     schema,

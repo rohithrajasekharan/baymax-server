@@ -1,11 +1,10 @@
-//Authentication setup for google
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20');
-const User = require('../models/user-model');
 
-//store user in the session (can be called from the app as one for all setup)
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const User = require('../models/user-model');
+const config = require('../config');
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
@@ -14,23 +13,23 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-//Google Strategy setup
 passport.use(
     new GoogleStrategy({
-      callbackURL: '/auth/google/redirect',
-      clientID: '880942137557-rndats23qikhetn9cg124ttlam0fr3e6.apps.googleusercontent.com',
-      clientSecret: 'G2sf84QTqcCZkv9CrkkVThWc'
+        // options for google strategy
+        clientID: config.clientID,
+        clientSecret: config.clientSecret,
+        callbackURL: '/auth/google/redirect'
     }, (accessToken, refreshToken, profile, done) => {
         User.findOne({googleId: profile.id}).then((currentUser) => {
-          console.log(profile);
             if(currentUser){
-                console.log('user is: ', currentUser);
                 done(null, currentUser);
             } else {
+                // if not, create user in our db
                 new User({
                     googleId: profile.id,
                     name: profile.displayName,
-                    avatar : profile.photos[0].value,
+                    email: profile.emails[0].value,
+                    avatar: profile._json.image.url
                 }).save().then((newUser) => {
                     done(null, newUser);
                 });
