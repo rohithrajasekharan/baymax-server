@@ -3,12 +3,12 @@ const Hospital = require('../models/hospital-model');
 const Doctor = require('../models/doctor-model');
 
 router.get('/:id',(req,res)=>{
-  Hospital.findById(req.params.id).then((data)=>{
+  Hospital.findById(req.params.id).populate('doctors').then((data)=>{
     res.json(data);
   });
 })
 router.get('/doctor/:id',(req,res)=>{
-  Doctor.findById(req.params.id).populate({path :'visits',select: '_id name description logo rating integrated'}).populate({path :'timing.id',select: '_id name description logo rating integrated'}).then((data)=>{
+  Doctor.findById(req.params.id).populate({path :'visits',select: '_id name description logo rating integrated'}).then((data)=>{
     res.json(data);
   });
 })
