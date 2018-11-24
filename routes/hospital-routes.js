@@ -13,7 +13,7 @@ router.get('/doctor/:id',(req,res)=>{
   });
 })
 router.post('/doctor',(req,res)=>{
-  Doctor.find({specialty: req.body.specialty}).then((data)=>{
+  Doctor.find({speciality: req.body.speciality}).then((data)=>{
     res.json(data);
   });
 })

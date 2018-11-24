@@ -16,6 +16,7 @@ const doctorSchema = mongoose.Schema({
   visits: [{type: Schema.Types.ObjectId, ref: 'hospital'}],
   canBook: Boolean,
   image: String,
+  speciality: [String],
   timing: [timingSchema]
 });
 

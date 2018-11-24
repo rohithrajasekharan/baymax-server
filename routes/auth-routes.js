@@ -45,8 +45,11 @@ router.get('/login/google', passport.authenticate('google', {
 
 // callback route for google to redirect to
 // hand control to passport to use code to grab profile info
-router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
-    res.json(req.user);
+router.get('/google/redirect', passport.authenticate('google'), (req, response) => {
+  response.writeHead(301,
+{Location: 'http://localhost:3000'}
+);
+response.end();
 });
 
 router.post('/applogin', (req,res)=>{
@@ -83,7 +86,7 @@ router.post('/login',
     });
 
 router.get('/logout',(req,res) => {
-  req.logout();
+  res.send(req.logout())
 }
     );
 //Landing page form
