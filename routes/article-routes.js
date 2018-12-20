@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user-model');
 const Article = require('../models/article-model');
 const Answer = require('../models/answer-model');
+const Tip = require('../models/tip-model');
 const ObjectId = mongoose.Types.ObjectId;
 
 router.post('/new', (req, res) => {
@@ -47,6 +48,12 @@ router.post('/answer', (req, res) => {
     })
   }
 
+});
+
+router.post('/gettip',(req,res)=>{
+  Tip.find({pageName:req.body.pageName}).sort({_id:-1}).limit(1).then((data)=>{
+    res.send(data)
+  })
 });
 
 router.post('/like', (req, res) => {
