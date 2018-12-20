@@ -7,7 +7,10 @@ module.exports = (ws)=> {
 
   ws.isAlive = true;
   ws.on('pong', () => {
-       ws.isAlive = true;
+    ws.isAlive = true;
+    wss.clients.forEach(function each(client) {
+      client.send('ping');
+  })
 });
   ws.on('message', function incoming(message) {
     var args = JSON.parse(message);
@@ -22,7 +25,8 @@ module.exports = (ws)=> {
         reply: args.reply,
         replyId: args.replyId,
         isDoc: args.isDoc,
-        time: new Date()
+        time: new Date(),
+        imageUrl: args.imageUrl
       });
       var count=0;
       newMessage.save().then((resp) => {

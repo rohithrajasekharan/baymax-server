@@ -22,14 +22,61 @@ router.post('/register', (req, res) => {
   });
 });
 
+
+router.post('/addcommunity',(req,res)=>{
+    User.findOneAndUpdate({"_id": req.body.id}, {$set: {community: req.body.community}},{new:true}).then((data)=>{
+      res.json(data);
+    })
+})
+
 router.get('/user', (req,res) => {
   res.json(req.user)
 });
-router.get('/:id', (req,res) => {
+router.get('/user/:id', (req,res) => {
   User.findById(req.params.id, {name:1,isDoc:1,_id:1}).then((res)=>{
     res.json(res);
   })
 });
+//initial call without authentication code
+router.get('/login/google', passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email']
+}));
+
+// callback route for google to redirect to
+// hand control to passport to use code to grab profile info
+router.get('/google/redirect', passport.authenticate('google'), (req, response) => {
+  response.writeHead(301,
+{Location: 'http://localhost:3000'}
+);
+response.end();
+});
+
+router.post('/applogin', (req,res)=>{
+  User.find({googleId:req.body.googleId}).then((user)=>{
+    if (user.length!==0) {
+      var data = {
+        user: user,
+        message: "user already exists"
+      }
+      res.send(data);
+    }else{
+      let name = req.body.name;
+      let email = req.body.email;
+      let googleId = req.body.googleId;
+      let newUser = new User({
+        name: name,
+        email: email,
+        googleId: googleId,
+        logintype: "google"
+      });
+      newUser.save().then((user)=>{
+        console.log(user);
+        res.json(user);
+      })
+    }
+  })
+})
 
 router.post('/login',
   passport.authenticate('local'),
@@ -39,7 +86,7 @@ router.post('/login',
     });
 
 router.get('/logout',(req,res) => {
-  req.logout();
+  res.send(req.logout())
 }
     );
 //Landing page form

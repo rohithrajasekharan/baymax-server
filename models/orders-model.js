@@ -8,6 +8,7 @@ const OrderSchema = mongoose.Schema({
   quantity: Number,
   userId: String,
   status: String,
+	statusmsg: String,
 	addressId: {type: Schema.Types.ObjectId, ref: 'user_addresse'}
 });
 

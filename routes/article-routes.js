@@ -35,11 +35,15 @@ router.post('/answer', (req, res) => {
   });
   if (req.body.type=='question') {
     Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 4}}).then(()=>{
-      res.json(newComment.save());
+      newComment.save((err,comment)=>{
+        res.json(comment);
+      });
     })
   }else{
     Article.update({_id :req.body.articleId}, {$inc : {'comments' : 1,'weight' : 1}}).then(()=>{
-      res.json(newComment.save());
+      newComment.save((err,comment)=>{
+        res.json(comment);
+      });
     })
   }
 
