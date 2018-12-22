@@ -12,6 +12,7 @@ router.get('/doctor/:id',(req,res)=>{
     res.json(data);
   });
 })
+
 router.post('/doctor',(req,res)=>{
   Doctor.find({speciality: req.body.speciality}).then((data)=>{
     res.json(data);
@@ -22,6 +23,7 @@ router.post('/doctorbyloc',(req,res)=>{
     res.json(data);
   });
 })
+
 router.post('/hospitalbyloc',(req,res)=>{
   Hospital.find({location: req.body.location}).then((data)=>{
     res.json(data);

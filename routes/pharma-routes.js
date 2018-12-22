@@ -5,6 +5,7 @@ const Cart = require('../models/cart-model')
 const Order = require('../models/orders-model')
 const Address = require('../models/address-model');
 const Product = require('../models/product');
+const Retailer = require('../models/retailer-model');
 
 router.get('/search',(req,res)=>{
   if (req.query.category=="") {
@@ -219,6 +220,18 @@ router.post('/removeAddress',(req, res)=> {
     address.remove().then(()=>{
       res.send('address removed')
     })
+  })
+});
+
+router.post('/retailerbyloc',(req,res)=>{
+  Retailer.find({location:req.body.location}).then((retailer)=>{
+    res.send(retailer)
+  })
+});
+
+router.post('/selectretailer',(req,res)=>{
+  Cart.findOneAndUpdate({_id:req.body.Cid},{$set:{retailer:req.body.Rid}},{$new:true}).then((Cart)=>{
+    res.send('Success')
   })
 });
 
