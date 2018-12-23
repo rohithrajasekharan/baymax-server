@@ -6,6 +6,8 @@ const Order = require('../models/orders-model')
 const Address = require('../models/address-model');
 const Product = require('../models/product');
 const Retailer = require('../models/retailer-model');
+const Geodata=require('../models/geodata');
+const RetailerCat=require('../models/retailer-catalogue');
 
 router.get('/search',(req,res)=>{
   if (req.query.category=="") {
@@ -180,7 +182,6 @@ router.post('/checkout', (req,res)=>{
   }).then(()=>{
     Cart.remove({userId:userId},(err,resp)=>{
         res.send("Added to Orders")
-
     })
   })
 })
@@ -223,16 +224,29 @@ router.post('/removeAddress',(req, res)=> {
   })
 });
 
-router.post('/retailerbyloc',(req,res)=>{
-  Retailer.find({location:req.body.location}).then((retailer)=>{
-    res.send(retailer)
-  })
-});
+// router.post('/retailerbyloc',(req,res)=>{
+//   Retailer.find({location:req.body.location}).then((retailer)=>{
+//     res.send(retailer)
+//   })
+// });
+//
+// router.post('/selectretailer',(req,res)=>{
+//   Cart.findOneAndUpdate({_id:req.body.Cid},{$set:{retailer:req.body.Rid}},{$new:true}).then((Cart)=>{
+//     res.send('Success')
+//   })
+// });
 
-router.post('/selectretailer',(req,res)=>{
-  Cart.findOneAndUpdate({_id:req.body.Cid},{$set:{retailer:req.body.Rid}},{$new:true}).then((Cart)=>{
-    res.send('Success')
+router.post('/checkav',(req,res)=>{
+  Geodata.find({ref_pin:req.body.ref}).then((geodata)=>{
+    var zone=geodata[0].nearby;
+    RetailerCat.countDocuments({r_id:{$in:zone},p_id:req.body.p}, (err,count)=>{
+      var x=false
+      if(count>=1)x=true
+      res.send(x)
+    })
   })
-});
+})
+
+
 
 module.exports = router;
