@@ -237,7 +237,11 @@ router.post('/removeAddress',(req, res)=> {
 // });
 
 router.post('/checkav',(req,res)=>{
-  Geodata.find({ref_pin:req.body.ref}).then((geodata)=>{
+  Geodata.find({ref_pin:req.body.ref}).then((err,geodata)=>{
+    if(err){
+      res.send(false);
+      return;
+    }
     var zone=geodata[0].nearby;
     RetailerCat.countDocuments({r_id:{$in:zone},p_id:req.body.p}, (err,count)=>{
       var x=false
