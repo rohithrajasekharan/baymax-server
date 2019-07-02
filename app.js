@@ -27,10 +27,7 @@ const server = app.listen(PORT, () => {
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({
-  credentials: true,
-  origin:"https://youcuredme-1521281583796.firebaseapp.com/"
-}));
+app.use(cors());
 
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
