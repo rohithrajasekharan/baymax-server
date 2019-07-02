@@ -12,6 +12,7 @@ const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
 const indexRoutes = require('./routes/index-routes');
+const adminRoutes = require('./routes/admin-routes');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -28,7 +29,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   credentials: true,
-  origin:"http://localhost:3000"
+  origin:"https://youcuredme-1521281583796.firebaseapp.com/"
 }));
 
 app.use(cookieSession({
@@ -53,7 +54,7 @@ app.use('/feed', feedRoutes);
 app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
 app.use('/hospital', hospitalRoutes);
-
+app.use('/admin', adminRoutes);
 app.use('/graphql', graphqlHTTP({
     schema,
     graphiql: true
