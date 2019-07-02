@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user-model');
 const Article = require('../models/article-model');
 const Answer = require('../models/answer-model');
+require("../app")
 const ObjectId = mongoose.Types.ObjectId;
 
 router.post('/load', (req, res) => {

@@ -26,10 +26,24 @@ const server = app.listen(PORT, () => {
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({
-  credentials: true,
-  origin:"http://localhost:3000"
-}));
+// app.use(cors({
+//   credentials: true,
+//   origin:"http://localhost:3000"
+// }));
+
+var whitelist = ['http://localhost:3000','http://localhost:5000', 'https://youcuredme-1521281583796.firebaseapp.com/']
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (whitelist.indexOf(req.header('Origin')) !== -1) {
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+
+app.use(cors({corsOptionsDelegate}));
 
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
