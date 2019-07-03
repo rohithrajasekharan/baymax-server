@@ -10,7 +10,7 @@ router.post('/new', (req, res) => {
   let newArticle = new Article({
     title: req.body.title,
     content: req.body.content,
-    userId: req.body.userId,
+    userId: [req.body.userId],
     pageName: req.body.pageName,
     type: req.body.type,
     videoId: req.body.videoId,
@@ -27,7 +27,7 @@ router.post('/new', (req, res) => {
 
 //for article manager portal
 router.post('/load', (req, res) => {
-  Article.find({ pageName: req.body.pageName }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, createdAt: 1 }).sort({ _id: -1 }).limit(30).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
+  Article.find({ pageName: req.body.pageName , type : 'article' }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, createdAt: 1 }).sort({ _id: -1 }).limit(30).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
   })
 });
@@ -35,6 +35,18 @@ router.post('/load', (req, res) => {
 router.post('/loadmore', (req, res) => {
   Article.find({ pageName: req.body.pageName, _id: { $lt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: -1 }).limit(10).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
+  })
+});
+
+router.post('/search', (req, res) => {
+  Article.find({title:{$regex:req.body.s}}, { title: 1, content: 1,createdAt: 1 }).sort({ _id: -1 }).limit(30).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
+    res.json(data);
+  })
+});
+
+router.post('/update', (req, res) => {
+  Article.updateOne({_id:req.body.id},{$set:{title:req.body.title,content:req.body.content}}).then(data=>{
+    res.json('sucess')
   })
 });
 //-------------------------------------------------------------
