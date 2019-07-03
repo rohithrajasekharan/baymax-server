@@ -25,6 +25,15 @@ router.post('/new', (req, res) => {
   })
 });
 
+//for article manager portal
+router.post('/load', (req, res) => {
+  Article.find({pageName: req.body.pageName},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},createdAt:1}).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+    res.json(data);
+  })
+  });
+//-------------------------------------------------------------
+
+
 router.post('/answer', (req, res) => {
   let newComment = new Answer({
      answer : req.body.answer,
