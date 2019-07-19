@@ -54,6 +54,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 mongoose.set('useCreateIndex', true)
+mongoose.set('useFindAndModify', false);
 mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme',{ useNewUrlParser: true }, () => {
     console.log("connected to db");
 });

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user-model');
 const Article = require('../models/article-model');
 const Answer = require('../models/answer-model');
+const Community = require('../models/community-model');
 const Tip = require('../models/tip-model');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -21,9 +22,31 @@ router.post('/new', (req, res) => {
     createdAt: Date.now()
   });
   newArticle.save().then((article) => {
-    res.json(article);
+    res.json(article)
   })
 });
+
+router.post('/newq', (req, res) => {
+  let newArticle = new Article({
+    title: req.body.title,
+    content: req.body.content,
+    userId: [req.body.userId],
+    pageName: req.body.pageName,
+    type: 'question',
+    likes: 0,
+    weight: 5,
+    comments: 0,
+    createdAt: Date.now()
+  });
+  newArticle.save().then((article) => {
+    Community.findOneAndUpdate({Name:req.body.pageName},{$inc:{postCount:1}},{new:true},(err,resp)=>{
+      if(err)Console.log(err);
+      res.json(article)
+    })
+  })
+});
+
+
 
 //for article manager portal
 router.post('/load', (req, res) => {
