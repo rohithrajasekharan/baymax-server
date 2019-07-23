@@ -11,7 +11,7 @@ const pharmaRoutes = require('./routes/pharma-routes');
 const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
-const indexRoutes = require('./routes/index-routes');
+const homeRoutes = require('./routes/home-routes');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -68,6 +68,7 @@ app.use('/feed', feedRoutes);
 app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
 app.use('/hospital', hospitalRoutes);
+app.use('/home', homeRoutes);
 
 app.use('/graphql', graphqlHTTP({
     schema,

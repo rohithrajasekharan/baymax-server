@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const ArticleSchema = mongoose.Schema({
 	title: String,
 	content: String,
+	jist:String,
 	userId: [{type: Schema.Types.ObjectId, ref: 'User'}],
 	pageName: String,
 	type: String,
