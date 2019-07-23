@@ -6,7 +6,7 @@ const Homepage = require('../models/home-model');
 router.post('/load', (req, res) => {
     var targetval = "x"
     if(req.body.pageName=="Baby and Me"){
-        calculateWeek()
+        // calculateWeek()
         targetval = req.body.pageName+"_week_"+(req.body.week.toString())
     }
     else if(req.body.pageName=="Diabetes"){
@@ -20,16 +20,5 @@ router.post('/load', (req, res) => {
         res.json(data);
     })
 });
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router;

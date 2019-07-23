@@ -26,7 +26,6 @@ Article.find({pageName: req.body.pageName,type:'question',_id: {$lt: req.body.la
 
 router.post('/communityInfo', (req, res) => {
   Community.find({Name: req.body.pageName},{_id: 0}).then(data=>{
-    console.log(data);
     res.json(data);
   })
   });

@@ -5,7 +5,8 @@ const NotificationSchema = mongoose.Schema({
 	title:String,
 	description:String,
 	url:String,
-	image:String
+	image:String,
+	seen:Boolean
 });
 
 const Product = module.exports = mongoose.model('notification', NotificationSchema);

@@ -12,6 +12,7 @@ const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
 const homeRoutes = require('./routes/home-routes');
+const serviceRoutes = require('./routes/service-routes');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -69,6 +70,7 @@ app.use('/pharma', pharmaRoutes);
 app.use('/chat', chatRoutes);
 app.use('/hospital', hospitalRoutes);
 app.use('/home', homeRoutes);
+app.use('/service', serviceRoutes);
 
 app.use('/graphql', graphqlHTTP({
     schema,
