@@ -49,18 +49,18 @@ router.post('/newq', (req, res) => {
 
 
 router.post('/loadarticles', (req, res) => {
-  Article.find({pageName: req.body.pageName,type:{$nin:['queation']}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['queation']}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
-  
+
   router.post('/refresharticles', (req, res) => {
-  Article.find({pageName: req.body.pageName,type:{$nin:['queation']},_id: {$gt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['queation']},_id: {$gt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
   router.post('/loadmorearticles', (req, res) => {
-  Article.find({pageName: req.body.pageName,type:{$nin:['queation']},_id: {$lt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['queation']},_id: {$lt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
@@ -69,13 +69,13 @@ router.post('/loadarticles', (req, res) => {
 
 //for article manager portal
 router.post('/load', (req, res) => {
-  Article.find({ pageName: req.body.pageName , type : 'article' }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, createdAt: 1 }).sort({ _id: -1 }).limit(30).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
+  Article.find({ pageName: req.community , type : 'article' }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, createdAt: 1 }).sort({ _id: -1 }).limit(30).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
   })
 });
 
 router.post('/loadmore', (req, res) => {
-  Article.find({ pageName: req.body.pageName, _id: { $lt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: -1 }).limit(10).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
+  Article.find({ pageName: req.community, _id: { $lt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: -1 }).limit(10).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
   })
 });
@@ -182,12 +182,12 @@ router.get('/bookmarks/:id', (req, res) => {
 })
 router.post('/bookmark', (req, res) => {
   if (req.body.type == "add") {
-    User.findOneAndUpdate({ _id: req.body.userId }, { $addToSet: { 'bookmark': req.body.articleId } }).then((data) => {
+    User.findOneAndUpdate({ _id: req.userId }, { $addToSet: { 'bookmark': req.body.articleId } }).then((data) => {
 
       res.send('Added to bookmark')
     })
   } else {
-    User.findOneAndUpdate({ _id: req.body.userId }, { $pull: { 'bookmark': req.body.articleId } }).then((data) => {
+    User.findOneAndUpdate({ _id: req.userId }, { $pull: { 'bookmark': req.body.articleId } }).then((data) => {
 
       res.send('Added to bookmark')
     })
