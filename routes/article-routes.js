@@ -11,8 +11,8 @@ router.post('/new', (req, res) => {
   let newArticle = new Article({
     title: req.body.title,
     content: req.body.content,
-    userId: [req.body.userId],
-    pageName: req.body.pageName,
+    userId: [req.userId],
+    pageName: req.community,
     type: req.body.type,
     videoId: req.body.videoId,
     imageId: req.body.imageId,
@@ -30,8 +30,8 @@ router.post('/newq', (req, res) => {
   let newArticle = new Article({
     title: req.body.title,
     content: req.body.content,
-    userId: [req.body.userId],
-    pageName: req.body.pageName,
+    userId: [req.userId],
+    pageName: req.community,
     type: 'question',
     likes: 0,
     weight: 5,
@@ -39,7 +39,7 @@ router.post('/newq', (req, res) => {
     createdAt: Date.now()
   });
   newArticle.save().then((article) => {
-    Community.findOneAndUpdate({Name:req.body.pageName},{$inc:{postCount:1}},{new:true},(err,resp)=>{
+    Community.findOneAndUpdate({Name:req.community},{$inc:{postCount:1}},{new:true},(err,resp)=>{
       if(err)Console.log(err);
       res.json(article)
     })
@@ -49,18 +49,18 @@ router.post('/newq', (req, res) => {
 
 
 router.post('/loadarticles', (req, res) => {
-  Article.find({pageName: req.community,type:{$nin:['queation']}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(20).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['question']}},{title: 1, content: 1 ,type:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
 
   router.post('/refresharticles', (req, res) => {
-  Article.find({pageName: req.community,type:{$nin:['queation']},_id: {$gt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['question']},_id: {$gt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:1}).limit(3).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
   router.post('/loadmorearticles', (req, res) => {
-  Article.find({pageName: req.community,type:{$nin:['queation']},_id: {$lt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
+  Article.find({pageName: req.community,type:{$nin:['question']},_id: {$lt: req.body.lastId}},{title: 1, content: 1 ,type:1,videoId:1,imageId:1,likedby:{ $elemMatch : { "$eq": ObjectId(req.body.id) }},likes: 1,comments:1,createdAt:1}).sort({_id:-1}).limit(10).populate({path: 'userId',select: '_id name avatar'}).then(data=>{
     res.json(data);
   })
   });
@@ -98,7 +98,7 @@ router.post('/answer', (req, res) => {
   let newComment = new Answer({
     answer: req.body.answer,
     articleId: req.body.articleId,
-    userId: req.body.userId,
+    userId: req.userId,
     type: req.body.type,
     votes: 0,
     createdAt: Date.now()
@@ -120,19 +120,19 @@ router.post('/answer', (req, res) => {
 });
 
 router.post('/gettip', (req, res) => {
-  Tip.find({ pageName: req.body.pageName }).sort({ _id: -1 }).limit(1).then((data) => {
+  Tip.find({ pageName: req.community }).sort({ _id: -1 }).limit(1).then((data) => {
     res.send(data)
   })
 });
 
 router.post('/like', (req, res) => {
   if (req.body.type == 'like') {
-    Article.findOneAndUpdate({ _id: req.body.articleId }, { $inc: { 'likes': 1, 'weight': 1 }, $push: { 'likedby': req.body.userId } }).then((data) => {
+    Article.findOneAndUpdate({ _id: req.body.articleId }, { $inc: { 'likes': 1, 'weight': 1 }, $push: { 'likedby': req.userId } }).then((data) => {
       res.send('Success');
     })
   }
   else if (req.body.type == 'dislike') {
-    Article.findOneAndUpdate({ _id: req.body.articleId }, { $inc: { 'likes': -1, 'weight': -1 }, $pull: { 'likedby': req.body.userId } }).then((data) => {
+    Article.findOneAndUpdate({ _id: req.body.articleId }, { $inc: { 'likes': -1, 'weight': -1 }, $pull: { 'likedby': req.userId } }).then((data) => {
       res.send('Success');
     })
   }
@@ -141,7 +141,7 @@ router.post('/like', (req, res) => {
 router.post('/vote', (req, res) => {
   if (req.body.type == 'upvote') {
     Answer.findOneAndUpdate({ _id: req.body.answerId }, { $inc: { 'votes': 1 } }).then((data) => {
-      User.findById(req.body.userId).then((user) => {
+      User.findById(req.userId).then((user) => {
         if (user.isDoc) {
           res.send('upvoted by doctor');
         } else {
@@ -222,7 +222,7 @@ router.post('/answers', (req, res) => {
 });
 
 
-router.get('/:id', (req, res) => {
+router.post('/:id', (req, res) => {
   Article.findById(req.params.id).populate({ path: 'userId', select: '_id name avatar' }).then((article) => {
     res.json(article);
   });

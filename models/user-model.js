@@ -9,18 +9,30 @@ const UserSchema = mongoose.Schema({
 		unique: true,
 		sparse: true
 	},
-  password: String,
 	isDoc: Boolean,
-  googleId: String,
-	facebookId: String,
 	avatar: String,
   logintype: String,
 	community: String,
 	lasttimestamp: Date,
-	bookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}]
+	bookmark: [{type: Schema.Types.ObjectId, ref: 'Article'}],
+	dob:Date,
+	gender:String,
+
+
+	//Baby and Me
+	week:Number,
+	status:String,
+
+	//diabetes
+	type:Number,
+	role:String,
+
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);
+
+
+///if not necessary delete the remaining code please verify
 
 module.exports.createUser = function(newUser, callback){
 
