@@ -125,7 +125,6 @@ app.post('/communityreset', (req,res)=>{
         //token need not have dob,name and gender details 
         delete update.dob
         delete update.gender
-        delete update.name
       //add the new data to existing token payload
         Object.assign(payload,update)
       //sign and send new token
