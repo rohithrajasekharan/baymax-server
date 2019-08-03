@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
 const NotificationSchema = mongoose.Schema({
-	userid:String,
+	userId:String,
 	title:String,
 	description:String,
 	url:String,
 	image:String,
-	seen:Boolean
+	seen:Boolean,
+	date:Date
 });
 
 const Product = module.exports = mongoose.model('notification', NotificationSchema);

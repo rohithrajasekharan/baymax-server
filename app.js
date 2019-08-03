@@ -122,16 +122,18 @@ app.post('/communityreset', (req,res)=>{
       var update=communityBasedPreProcessor(req);
       console.log(update);
       User.updateOne({_id:authData.user._id},{$set:update}).then(data=>{
-        //token need not have dob,name and gender details 
-        delete update.dob
-        delete update.gender
-      //add the new data to existing token payload
-        Object.assign(payload,update)
-      //sign and send new token
-        jwt.sign({user:payload}, "secretkey", (err,token)=>{
-          res.json({token});
-        });
-      })
+         Community.updateOne({Name:community},{$inc:{memberCount:1}}).then(data=>{
+          //token need not have dob,name and gender details 
+          delete update.dob
+          delete update.gender
+          //add the new data to existing token payload
+          Object.assign(payload,update)
+          //sign and send new token
+          jwt.sign({user:payload}, "secretkey", (err,token)=>{
+            res.json({token});
+          });
+        })
+       })
     }
   });
 });

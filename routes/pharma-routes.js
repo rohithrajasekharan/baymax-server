@@ -67,9 +67,9 @@ router.post('/addquantity',(req,res)=>{
     }
   })
 })
-router.get('/:id',(req, res)=> {
-  Product.findById(req.params.id, (err,products)=>{
-    res.json(products);
+router.post('/',(req, res)=> {
+  Product.findById(req.body.productId, (err,product)=>{
+    res.json(product);
   })
 });
 router.post('/checkcart',(req,res)=>{
@@ -95,8 +95,9 @@ router.post('/myorders', (req,res)=>{
   Order.find({userId:req.body.userid}).populate({path:'productId',select:'name price brand image'}).then((resp)=>{
     res.json(resp);
   })
-
 })
+
+
 router.post('/orders',(req,res)=>{
   console.log("all");
   Order.find().populate({path:'productId',select:'name price brand image'}).then((resp)=>{

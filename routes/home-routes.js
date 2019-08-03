@@ -10,13 +10,13 @@ router.post('/load', (req, res) => {
         targetval = req.community+"_week_"+(req.body.week.toString())
     }
     else if(req.community=="Diabetes"){
-        targetval = req.community+"_week_"+(req.body.type.toString())
+        targetval = req.community+"_type_"+(req.body.type.toString())
     }
     else if(req.community=="General"){
         targetval = req.community
     }
     console.log(targetval)
-    Homepage.find({target: targetval},{_id:0,target:0}).populate({path:'dailyReads',select:'_id title jist imageId'}).populate({path:'recomProducts'}).then(data=>{
+    Homepage.find({target: targetval},{_id:0,target:0}).populate({path:'dailyReads',select:'_id title jist imageId'}).populate({path:'recomProducts'}).populate({path:'videos',select:'_id title content type imageId'}).then(data=>{
         res.json(data);
     })
 });

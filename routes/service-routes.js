@@ -17,23 +17,26 @@ router.post('/new', (req, res) => {
             place: req.body.place,
             hospital: req.body.hospital,
             additional: req.body.additional,
+            by:req.userId
         }
     )
 
 
     //also publish an acknowledgement notification for users
     let newNotification=new Notif({
-        userid:"5cce9b142633da0015e6d94b",//to be corrected after auth is implmented
+        userId:req.userId,//to be corrected after auth is implmented
 	    title:"Request recieved",
 	    description:"Your req for "+req.body.service+" has been recieved, we will contact you soon",
         url:"",
         seen:false,
+        date:Date.now(),
 	    image:"https://scontent.fcok1-1.fna.fbcdn.net/v/t1.0-9/27973914_920426974784040_9138489774688341309_n.jpg?_nc_cat=103&_nc_oc=AQlHN5x4cQIKX0681dqmj7WdxcdYCooclw71J2AlESo0StnPcfW1euEHYi-OzaTUdbis5vzw5cvga-ceWKL6Wwe2&_nc_ht=scontent.fcok1-1.fna&oh=477de50ec5f3a8f3962815b493c833f5&oe=5DA2C4C9"
     })
 
     newServiceRequest.save().then((serviceRequest)=>{
-        newNotification.save()
-        res.json(serviceRequest)
+        newNotification.save().then(()=>{
+            res.json(serviceRequest)
+        })
     })
 });
 

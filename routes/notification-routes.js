@@ -5,29 +5,28 @@ const Notif = require('../models/notification-model');
 
 
 router.post("/load",(req,res)=>{
-    Notif.find({userid:uid}).exec((err,result)=>{
+    Notif.find({userId:req.userId}).then((result)=>{
         res.json(result)
     })
 })
 
 router.post("/clear",(req,res)=>{
-    Notif.deleteMany({userid:uid}).exec((err,result)=>{
-        if(err)res.send("failed")
-        else res.send("success")
+    Notif.deleteMany({userId:req.userId}).then((result)=>{
+        res.sendStatus(200)
     })
 })
 
 
 router.post("/loadgeneral",(req,res)=>{
-    Notif.find({userid:"global"}).exec((err,result)=>{
+    Notif.find({userId:"global"}).exec((err,result)=>{
         res.json(result)
   })
 })
 
 router.post("/delete",(req,res)=>{
-    Notif.findByIdAndDelete(dpos,(err,result)=>{
-        if(err)res.send("failed")
-        else res.send("success")
+    Notif.findByIdAndDelete({userId:req.userId,_id:req.body.id},(err,result)=>{
+        if(!err)
+        res.sendStatus(200)
     })
 })
 
@@ -39,18 +38,18 @@ router.get("/",(req,res)=>{
 
     console.log(dpos)
     if(dpos=="load"){
-        Notif.find({userid:uid}).exec((err,result)=>{
+        Notif.find({userId:uid}).exec((err,result)=>{
             res.json(result)
         })
     }
     else if(dpos=="All"){
-        Notif.deleteMany({userid:uid}).exec((err,result)=>{
+        Notif.deleteMany({userId:uid}).exec((err,result)=>{
             if(err)res.send("failed")
             else res.send("success")
         })
     }
     else if(dpos=="general"){
-        Notif.find({userid:"global"}).exec((err,result)=>{
+        Notif.find({userId:"global"}).exec((err,result)=>{
               res.json(result)
         })
     }
