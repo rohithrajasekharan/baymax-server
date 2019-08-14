@@ -217,6 +217,15 @@ function intOf(votetype) {
 
 
 
+router.post('/getvotestate', (req, res) => {
+  Vote.findOne({ userId: req.body.userId, answerId: req.body.answerId }, function (err, vote) {
+    res.json(vote.type);
+  });
+});
+
+
+
+
 router.get('/removearticle/:id', (req, res) => {
   Article.findById(req.params.id).then((article) => {
     article.remove().then(() => {
