@@ -143,11 +143,11 @@ router.post('/vote', (req, res) => {
   var voteState = 0
   var change
   //get current state of user
-  Vote.findOne({ userId: req.body.userId, answerId: req.body.answerId }, function (err, vote) {
+  Vote.findOne({ userId: req.userId, answerId: req.body.answerId }, function (err, vote) {
     if (vote == null) {
       //if there is no existing vote(doc in collection)
       let newVote = new Vote({
-        userId: req.body.userId,
+        userId: req.userId,
         answerId: req.body.answerId,
         type: req.body.type
       })
@@ -218,7 +218,7 @@ function intOf(votetype) {
 
 
 router.post('/getvotestate', (req, res) => {
-  Vote.findOne({ userId: req.body.userId, answerId: req.body.answerId }, function (err, vote) {
+  Vote.findOne({ userId: req.userId, answerId: req.body.answerId }, function (err, vote) {
     res.json(vote.type);
   });
 });
