@@ -85,6 +85,10 @@ function verifyToken(req,res,next){
 }
 
 
+app.get('/ping', (req,res)=>{
+  res.send("pong");
+})
+
 app.post('/ping', (req,res)=>{
   res.send("pong");
 })
