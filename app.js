@@ -8,7 +8,7 @@ const authRoutes = require('./routes/auth-routes');
 const passportSetup = require('./config/google-auth');
 const articleRoutes = require('./routes/article-routes');
 const feedRoutes = require('./routes/feed-routes');
-const pharmaRoutes = require('./routes/pharma-routes');
+const storeRoutes = require('./routes/store-routes');
 const chatRoutes = require('./routes/chat-routes');
 const notifRoutes = require('./routes/notification-routes');
 const hospitalRoutes = require('./routes/hospital-routes');
@@ -83,26 +83,12 @@ function verifyToken(req,res,next){
     res.sendStatus(403);
   }
 }
-app.use('/auth',verifyToken, authRoutes);
-app.use('/article',verifyToken, articleRoutes);
-app.use('/notification',verifyToken, notifRoutes);
-app.use('/feed',verifyToken, feedRoutes);
-app.use('/pharma',verifyToken, pharmaRoutes);
-app.use('/chat',verifyToken, chatRoutes);
-app.use('/hospital',verifyToken, hospitalRoutes);
-app.use('/home',verifyToken, homeRoutes);
-app.use('/service',verifyToken, serviceRoutes);
 
-app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql: true
-}));
 
-app.post("/getCommunityInfo",verifyToken,(req,res)=>{
-  Community.find({},{_id:0}).sort({Name:1}).then((data)=>{
-    res.json({data})
-  })
+app.post('/ping', (req,res)=>{
+  res.send("pong");
 })
+
 
 app.post('/communityreset', (req,res)=>{
   const token = req.body.token;
@@ -181,10 +167,6 @@ app.post('/tokensignin', (req,res)=>{
 verify().catch(console.error);
 });
 
-
-
-
-
 //verify if only the necessary data is being sent by the user  according to community
 //schema in mongoose prevents the same from happening this is just a double check
 function communityBasedPreProcessor(req){
@@ -223,6 +205,25 @@ function communityBasedPreProcessor(req){
   }
   return update
 }
+
+//to get info on all communities
+app.post("/getCommunityInfo",verifyToken,(req,res)=>{
+  Community.find({},{_id:0}).sort({Name:1}).then((data)=>{
+    res.json({data})
+  })
+})
+
+
+app.use('/auth', authRoutes);
+app.use('/article', articleRoutes);
+app.use('/notification',verifyToken, notifRoutes);
+app.use('/feed',verifyToken, feedRoutes);
+app.use('/store', storeRoutes);
+app.use('/chat',verifyToken, chatRoutes);
+app.use('/hospital',verifyToken, hospitalRoutes);
+app.use('/home',verifyToken, homeRoutes);
+app.use('/service',verifyToken, serviceRoutes);
+
 
 const wss = module.exports.wss = new WebSocket.Server({server});
 wss.on('connection', SocketManager);

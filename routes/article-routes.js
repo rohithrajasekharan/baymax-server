@@ -5,6 +5,7 @@ const Article = require('../models/article-model');
 const Answer = require('../models/answer-model');
 const Vote = require('../models/vote-model');
 const Community = require('../models/community-model');
+const Bookmark = require('../models/bookmark-model');
 const Tip = require('../models/tip-model');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -54,7 +55,6 @@ router.post('/loadarticles', (req, res) => {
     res.json(data);
   })
 });
-
 router.post('/refresharticles', (req, res) => {
   Article.find({ pageName: req.community, type: { $nin: ['question'] }, _id: { $gt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: 1 }).limit(3).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
@@ -120,12 +120,6 @@ router.post('/answer', (req, res) => {
 
 });
 
-router.post('/gettip', (req, res) => {
-  Tip.find({ pageName: req.community }).sort({ _id: -1 }).limit(1).then((data) => {
-    res.send(data)
-  })
-});
-
 router.post('/like', (req, res) => {
   if (req.body.type == 'like') {
     Article.findOneAndUpdate({ _id: req.body.articleId }, { $inc: { 'likes': 1, 'weight': 1 }, $push: { 'likedby': req.userId } }).then((data) => {
@@ -139,6 +133,7 @@ router.post('/like', (req, res) => {
   }
 });
 
+//vote
 router.post('/vote', (req, res) => {
   var voteState = 0
   var change
@@ -214,9 +209,6 @@ function intOf(votetype) {
   else return 0
 }
 
-
-
-
 router.post('/getvotestate', (req, res) => {
   Vote.findOne({ userId: req.userId, answerId: req.body.answerId }, function (err, vote) {
     res.json(vote.type);
@@ -244,24 +236,50 @@ router.get('/removeanswer/:id', (req, res) => {
 
 });
 
-router.get('/bookmarks/:id', (req, res) => {
-  User.find({ _id: req.params.id }, { bookmark: 1, _id: 0 }).populate({ path: 'bookmark', select: '_id title userId content pageName imageId type createdAt comments', populate: { path: "userId", select: '_id name avatar isDoc' } }).populate('bookmark.userId').then((user) => {
+
+//bookmarks
+router.get('/bookmarks', (req, res) => {
+  Bookmark.find({ userId: req.userId }, { bookmark: 1, _id: 0 }).populate({ path: 'bookmark', select: '_id title userId content pageName imageId type createdAt comments', populate: { path: "userId", select: '_id name avatar isDoc' } }).populate('bookmark.userId').then((user) => {
     res.json(user);
   })
 })
+router.post('/checkBookmark',(req,res)=>{
+  checkBookmark(req.body.userId,req.body.articleId,res,(data)=>{
+    if(data)res.status(200).send(true)
+    else res.status(200).send(false)
+  })
+})
+function checkBookmark(userId,articleId,res,callback){
+  Bookmark.find({userId:userId,articleId:articleId},(err,data)=>{
+    console.log(data)
+    console.log(data.length)
+    if(err)res.status(500).send("error")
+    if(data.length>0)callback(true)
+    else return callback(false)
+  })
+}
 router.post('/bookmark', (req, res) => {
   if (req.body.type == "add") {
-    User.findOneAndUpdate({ _id: req.userId }, { $addToSet: { 'bookmark': req.body.articleId } }).then((data) => {
-
-      res.send('Added to bookmark')
-    })
-  } else {
-    User.findOneAndUpdate({ _id: req.userId }, { $pull: { 'bookmark': req.body.articleId } }).then((data) => {
-
-      res.send('Added to bookmark')
+      checkBookmark(req.body.userId,req.body.articleId,res,(bookmarked)=>{
+        if(bookmarked)res.status(200).send("already bookmarked")
+        else{
+          let newBookmark=new Bookmark({
+            articleId:req.body.articleId,
+            userId:req.body.userId,
+          })
+      
+          newBookmark.save((err,data)=>{
+            if(err)res.status(500).send("error")
+            res.status(200).send("bookmark added")
+          })
+        }
+      })
+  } else if(req.body.type == "remove"){
+    Bookmark.deleteOne({_id:req.body.bookmarkId,userId:req.body.userId},(err)=>{
+      if(err)res.status(500).send("error")
+      else res.status(200).send("bookmark removed")
     })
   }
-
 })
 
 //router.get('/feed/:pageName/:id', (req, res) => {

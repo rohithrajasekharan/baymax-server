@@ -3,14 +3,22 @@ const Schema = mongoose.Schema;
 const Product = require('./product');
 
 const PharmaHomeSchema = mongoose.Schema({
-  category: String,
+  community: String,
   banner: [{
     image: String,
     title: String,
     description: String,
     url: String
   }],
-  products: [{type: Schema.Types.ObjectId, ref: 'pharmaproduct'}]
+  categories:[{
+    name:String,
+    image:String,
+  }],
+  sections:[{
+    name:String,
+    type:String,
+    products:[{type: Schema.Types.ObjectId, ref: 'pharmaproduct'}]
+  }]
 });
 
 const PharmaHome = module.exports = mongoose.model('pharmahome', PharmaHomeSchema);
