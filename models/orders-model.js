@@ -1,15 +1,21 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Product = require('./product');
 const Address = require('./address-model');
 
 const OrderSchema = mongoose.Schema({
-	productId: {type: Schema.Types.ObjectId, ref: 'pharmaproduct'},
+	products: [{
+    product:{type: Schema.Types.ObjectId, ref: 'pharmaproduct'},
+    quantity:Number,
+    _id:false
+  }],
   quantity: Number,
   userId: String,
   status: String,
-	statusmsg: String,
-	addressId: {type: Schema.Types.ObjectId, ref: 'user_addresse'}
+  tracking:[String],
+  addressId: {type: Schema.Types.ObjectId, ref: 'user_addresse'},
+  order_id:String,
+  payment_id:String,
+  payment_signature:String
 });
 
 const Order = module.exports = mongoose.model('Order', OrderSchema);

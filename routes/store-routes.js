@@ -10,9 +10,9 @@ const Geodata = require('../models/geodata');
 const RetailerCat = require('../models/retailer-catalogue');
 
 router.post('/search', (req, res) => {
-  var keyword=req.body.keyword;
-  keyword=keyword.replace(/[^a-zA-Z0-9 ]/g, "");
-  Product.find({name:{$regex:keyword,$options : "i"}}).limit(20).then((response) => {
+  var keyword = req.body.keyword;
+  keyword = keyword.replace(/[^a-zA-Z0-9 ]/g, "");
+  Product.find({ name: { $regex: keyword, $options: "i" } }).limit(20).then((response) => {
     res.json(response);
   })
 })
@@ -35,7 +35,7 @@ router.post('/product', (req, res) => {
 //update quantity inside cart of a user
 router.post('/addquantity', (req, res) => {
   var quantity = parseInt(req.body.quantity)
-  Cart.findOneAndUpdate({ "userId": req.body.userid, "productId": req.body.productid }, { $set: { quantity: req.body.quantity } }, { new: true }).then((resp) => {
+  Cart.findOneAndUpdate({ "userId": req.userId, "productId": req.body.productid }, { $set: { quantity: req.body.quantity } }, { new: true }).then((resp) => {
     if (resp.quantity == quantity) {
       res.send("quantity updated")
     } else {
@@ -45,7 +45,7 @@ router.post('/addquantity', (req, res) => {
 })
 //check if product is already in cart
 router.post('/checkcart', (req, res) => {
-  var userid = req.body.userid;
+  var userid = req.userId;
   var productid = req.body.productid;
   Cart.find({ userId: userid, productId: productid }, (err, product) => {
     if (product.length == 0) {
@@ -57,14 +57,14 @@ router.post('/checkcart', (req, res) => {
 })
 //load cart for a user
 router.post('/cart', (req, res) => {
-  let userid = req.body.userid;
+  let userid = req.userId;
   Cart.find({ 'userId': userid }).populate({ path: 'productId', select: 'name price brand image' }).then((resp) => {
     res.json(resp);
   });
 })
 //load existing orders for a user
 router.post('/myorders', (req, res) => {
-  Order.find({ userId: req.body.userid }).populate({ path: 'productId', select: 'name price brand image' }).then((resp) => {
+  Order.find({ userId: req.userId }).populate({ path: 'productId', select: 'name price brand image' }).then((resp) => {
     res.json(resp);
   })
 })
@@ -134,7 +134,7 @@ router.post('/cancelorder', (req, res) => {
 
 router.post('/addtocart', (req, res) => {
   let cart = new Cart({
-    userId: req.body.userId,
+    userId: req.userId,
     productId: req.body.productId,
     quantity: 1
   });
@@ -144,29 +144,8 @@ router.post('/addtocart', (req, res) => {
   )
 })
 
-router.post('/checkout', (req, res) => {
-  let userId = req.body.userId;
-  Cart.find({ userId: userId }).then((resp) => {
-    resp.map((cart) => {
-      let order = new Order({
-        userId: userId,
-        productId: cart.productId,
-        quantity: cart.quantity,
-        status: "Awaiting confirmation",
-        addressId: req.body.addressId
-      })
-
-      order.save();
-    })
-  }).then(() => {
-    Cart.remove({ userId: userId }, (err, resp) => {
-      res.send("Added to Orders")
-    })
-  })
-})
-
 router.post('/removefromcart', (req, res) => {
-  var userid = req.body.userid;
+  var userid = req.userId;
   var productid = req.body.productid;
   Cart.deleteOne({ userId: userid, productId: productid }, (err, product) => {
     if (err) {
@@ -177,6 +156,42 @@ router.post('/removefromcart', (req, res) => {
   })
 })
 
+//(addres)
+router.post('/checkout', (req, res) => {
+  let userId = req.userId;
+  Cart.find({ userId: userId }).then((resp) => {
+    var pdcts = []
+    if (resp.length > 0){
+      for (var cartitem of resp) {
+        pdcts.push({
+          product:cartitem.productId,
+          quantity:cartitem.quantity
+        })
+      }
+
+      let order = new Order({
+        userId: userId,
+        products: pdcts,
+        status: "Awaiting payment",
+        addressId: req.body.addressId
+      })
+
+      order.save((err,order)=>{
+        if(err)res.status(500).send("error")
+        Cart.deleteMany({ userId: userId }, (err, resp) => {
+          if (err) res.status(500).send("error")
+          res.status(200).send("Added to Orders")
+        })
+      })
+    }
+    else{
+      res.status(200).send("Cart is empty")
+    }
+  })
+})
+
+
+//address management
 router.post('/address', (req, res) => {
   Address.find({ userId: req.body.id }, (err, address) => {
     console.log(err + address);
@@ -186,7 +201,7 @@ router.post('/address', (req, res) => {
 
 router.post('/addAddress', (req, res) => {
   let newAddress = new Address({
-    userId: req.body.id,
+    userId: req.userId,
     addr: req.body.addr,
     pincode: req.body.pincode
   })
