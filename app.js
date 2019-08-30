@@ -27,6 +27,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log('app listening on port ' + PORT);
+  console.log(process.env.NODE_ENV);
 })
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -224,8 +225,8 @@ app.post("/getCommunityInfo", verifyToken, (req, res) => {
 })
 
 
-app.use('/auth', authRoutes);
-app.use('/article', articleRoutes);
+app.use('/auth',verifyToken,authRoutes);
+app.use('/article',verifyToken, articleRoutes);
 app.use('/notification', verifyToken, notifRoutes);
 app.use('/feed', verifyToken, feedRoutes);
 app.use('/store',verifyToken, storeRoutes);
