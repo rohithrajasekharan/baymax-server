@@ -4,20 +4,20 @@ const Product = require('./product');
 
 const PharmaHomeSchema = mongoose.Schema({
   community: String,
-  banner: [{
-    image: String,
-    title: String,
-    description: String,
-    url: String
-  }],
+  banner: [{type:String}],
   categories:[{
     name:String,
     image:String,
   }],
-  sections:[{
+  communitysections:[{
     name:String,
-    type:String,
-    products:[{type: Schema.Types.ObjectId, ref: 'pharmaproduct'}]
+    structure:String,
+    items:[{
+      name:String,
+      price:Number,
+      id:String,
+      image:String
+    }]
   }]
 });
 

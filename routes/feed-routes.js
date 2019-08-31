@@ -14,7 +14,7 @@ router.post('/load', (req, res) => {
 });
 
 router.post('/refresh', (req, res) => {
-  Article.find({ pageName: req.community, type: 'question', _id: { $gt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: 1 }).limit(3).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
+  Article.findOne({ pageName: req.community, type: 'question', _id: { $gt: req.body.lastId } }, { title: 1, content: 1, type: 1, videoId: 1, imageId: 1, likedby: { $elemMatch: { "$eq": ObjectId(req.body.id) } }, likes: 1, comments: 1, createdAt: 1 }).sort({ _id: 1 }).limit(3).populate({ path: 'userId', select: '_id name avatar' }).then(data => {
     res.json(data);
   })
 });

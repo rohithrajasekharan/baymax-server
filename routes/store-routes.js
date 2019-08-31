@@ -18,11 +18,11 @@ router.post('/search', (req, res) => {
 })
 
 
-
+//()
 router.post('/home', (req, res) => {
-  PharmaHome.find({ community: req.body.category }).populate({ path: 'products', select: 'name price image' }).then((products) => {
+  PharmaHome.find({ community: req.community }).then((products) => {
     res.json(products)
-  });
+  }).catch(console.error);
 });
 
 //get product details

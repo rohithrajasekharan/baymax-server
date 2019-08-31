@@ -26,8 +26,8 @@ const SocketManager = require('./socketmanager');
 const app = express();
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
-  console.log('app listening on port ' + PORT);
   console.log(process.env.NODE_ENV);
+  console.log('app listening on port ' + PORT);
 })
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -66,29 +66,24 @@ mongoose.connect('mongodb://vijaicv:ucuredme@ds113179.mlab.com:13179/youcuredme'
 
 
 function verifyToken(req, res, next) {
-  if (process.env.NODE_ENV === 'production') {
-    const bearerHeader = req.headers['authorization'];
-    if (typeof bearerHeader !== 'undefined') {
-      const bearer = bearerHeader.split(" ");
-      const bearerToken = bearer[1];
-      req.token = bearerToken;
-      jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) {
-          res.sendStatus(403);
-        } else {
-          req.userId = authData.user._id;
-          req.community = authData.user.community;
-          next();
-        }
-      })
-    } else {
-      res.sendStatus(403);
-    }
+  const bearerHeader = req.headers['authorization'];
+  if (typeof bearerHeader !== 'undefined') {
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+      if (err) {
+        res.sendStatus(403);
+      } else {
+        req.userId = authData.user._id;
+        req.community = authData.user.community;
+        next();
+      }
+    })
+  } else {
+    res.sendStatus(403);
   }
-  else{
-    req.userId=req.body.userId
-    next();
-  }
+
 }
 
 
@@ -225,17 +220,15 @@ app.post("/getCommunityInfo", verifyToken, (req, res) => {
 })
 
 
-app.use('/auth',verifyToken,authRoutes);
-app.use('/article',verifyToken, articleRoutes);
+app.use('/auth', verifyToken, authRoutes);
+app.use('/article', verifyToken, articleRoutes);
 app.use('/notification', verifyToken, notifRoutes);
 app.use('/feed', verifyToken, feedRoutes);
-app.use('/store',verifyToken, storeRoutes);
-app.use('/pay',verifyToken, paymentRoutes);
+app.use('/store', verifyToken, storeRoutes);
+app.use('/pay', verifyToken, paymentRoutes);
 app.use('/chat', verifyToken, chatRoutes);
 app.use('/hospital', verifyToken, hospitalRoutes);
 app.use('/home', verifyToken, homeRoutes);
 app.use('/service', verifyToken, serviceRoutes);
 
 
-const wss = module.exports.wss = new WebSocket.Server({ server });
-wss.on('connection', SocketManager);
